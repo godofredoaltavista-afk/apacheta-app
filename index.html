@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Apacheta — Tu biblia. Tu lenguaje. Tu frecuencia.</title>
+  <meta name="description" content="Hub de conocimiento personal y mindfulness. Construí tu propia biblia." />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/variables.css" />
+  <link rel="stylesheet" href="/styles/global.css" />
+  <link rel="stylesheet" href="/styles/animations.css" />
+  <link rel="stylesheet" href="/styles/sections.css" />
+  <link rel="stylesheet" href="/styles/new-sections.css" />
+
+  <!-- Theme init (antes de pintar) -->
+  <script>
+    (function() {
+      const u = JSON.parse(localStorage.getItem('apacheta_user') || '{}');
+      if (u.colores && u.colores[0]) {
+        const r = document.documentElement;
+        r.style.setProperty('--color-personal-1', u.colores[0]);
+        r.style.setProperty('--color-personal-2', u.colores[1] || '#F4C2C2');
+        r.style.setProperty('--color-personal-3', u.colores[2] || '#FFE44D');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     THREE.JS CANVAS — background global
+     ════════════════════════════════════════ -->
+<canvas id="apacheta-canvas" aria-hidden="true"></canvas>
+
+<!-- ════════════════════════════════════════
+     APP SHELL
+     ════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 0: ONBOARDING
+       Primera visita solamente
+       ══════════════════════════════════════ -->
+  <section id="onboarding" class="section" aria-label="Onboarding">
+    <!-- Aura de fondo -->
+    <div class="onboarding__aura">
+      <div class="orb" style="width:220px;height:220px;top:-40px;right:-40px;background:var(--color-personal-1);"></div>
+      <div class="orb" style="width:180px;height:180px;bottom:60px;left:-60px;background:var(--color-personal-2);"></div>
+      <div class="orb" style="width:120px;height:120px;bottom:20%;right:10%;background:var(--color-personal-3);opacity:0.2;"></div>
+    </div>
+
+    <!-- Card central -->
+    <div class="onboarding__card anim-fade-scale">
+      <h1 class="onboarding__greeting">
+        Buen día 🌱<br/>¿Cómo te llamás?
+      </h1>
+      <p class="onboarding__sub">
+        Contanos quién sos. La app se adapta a vos.
+      </p>
+
+      <!-- Nombre -->
+      <div class="onboarding__field">
+        <label class="onboarding__label" for="ob-nombre">Tu nombre</label>
+        <input
+          id="ob-nombre"
+          class="onboarding__input"
+          type="text"
+          placeholder="Franco, Joaco, Luna…"
+          autocomplete="given-name"
+        />
+      </div>
+
+      <!-- Signo zodiacal -->
+      <div class="onboarding__field">
+        <label class="onboarding__label" for="ob-signo">Signo zodiacal</label>
+        <input
+          id="ob-signo"
+          class="onboarding__input"
+          type="text"
+          placeholder="Géminis, Escorpio, Aries…"
+        />
+      </div>
+
+      <!-- Fecha de nacimiento -->
+      <div class="onboarding__field">
+        <label class="onboarding__label" for="ob-fecha">Fecha de nacimiento</label>
+        <input
+          id="ob-fecha"
+          class="onboarding__input"
+          type="date"
+        />
+      </div>
+
+      <!-- Selector de colores -->
+      <div style="margin-top: 24px;">
+        <p class="color-picker__title">
+          Elegí 3 colores que te representan<br/>
+          <span style="font-size:0.75rem;color:var(--text-muted);">Define tu aura personal</span>
+        </p>
+
+        <!-- Preview de aura -->
+        <div class="color-picker__preview" id="color-preview"></div>
+
+        <!-- Swatches -->
+        <div class="color-picker__grid" id="color-grid">
+          <button class="color-picker__swatch" data-color="#A8E6E0" style="background:#A8E6E0;" aria-label="Cian pastel"></button>
+          <button class="color-picker__swatch" data-color="#F4C2C2" style="background:#F4C2C2;" aria-label="Rosa pastel"></button>
+          <button class="color-picker__swatch" data-color="#FFE44D" style="background:#FFE44D;" aria-label="Amarillo marcador"></button>
+          <button class="color-picker__swatch" data-color="#D4C5E8" style="background:#D4C5E8;" aria-label="Lavanda"></button>
+          <button class="color-picker__swatch" data-color="#B8D4B0" style="background:#B8D4B0;" aria-label="Sage"></button>
+          <button class="color-picker__swatch" data-color="#F5D89A" style="background:#F5D89A;" aria-label="Amber"></button>
+        </div>
+      </div>
+
+      <button id="ob-submit" class="btn btn--primary btn--full" style="margin-top:8px;">
+        Empezar →
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 1: HERO MORNING
+       Como referencia "Good Morning"
+       ══════════════════════════════════════ -->
+  <section id="hero-morning" class="section" aria-label="Buenos días">
+    <!-- Aura radial de fondo -->
+    <div class="hero-morning__aura"></div>
+
+    <!-- Time stamp -->
+    <p class="hero-morning__time reveal-item">
+      <span>◷</span>
+      <span id="hm-time">11:11</span>
+    </p>
+
+    <!-- Título enorme -->
+    <h1 class="hero-morning__title reveal-item stagger-2" id="hm-greeting">
+      Buen<br/>Día
+    </h1>
+
+    <!-- Floating cards como la referencia -->
+    <div class="hero-morning__cards">
+      <!-- Card principal con nota/frase -->
+      <div class="morning-card morning-card--main reveal-item stagger-3">
+        <p class="card__label">Frase del día</p>
+        <p class="morning-card__content-text" id="hm-frase" style="font-family:var(--font-display);font-size:1.05rem;line-height:1.5;font-weight:600;">
+          La sabiduría es saber que soy nada, el amor es saber que soy todo.
+        </p>
+        <div class="morning-card__meta">
+          <span>◎</span>
+          <span>Nisargadatta</span>
+          <span style="margin-left:auto;">hace un momento</span>
+        </div>
+      </div>
+
+      <!-- Card de fecha -->
+      <div class="morning-card morning-card--date reveal-item stagger-4">
+        <p class="morning-card__date-day" id="hm-dayname">Miércoles</p>
+        <p class="morning-card__date-full" id="hm-date">Abr 15</p>
+        <div class="morning-card__meta" style="margin-top:12px;">
+          <span>□</span>
+          <span>Hoy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav pills — collapsible with animated home icon -->
+    <nav class="morning-nav" id="morning-nav" aria-label="Navegación principal">
+      <!-- Animated home button -->
+      <button class="morning-nav__home" id="nav-home-btn" aria-label="Inicio" title="Inicio">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z" fill="currentColor" opacity="0.9"/>
+          <circle cx="12" cy="11" r="2" fill="currentColor" opacity="0.4"/>
+        </svg>
+      </button>
+      <a href="#biblioteca"  class="morning-nav__item" data-section="biblioteca">
+        <span>◈</span> <span>Biblioteca</span>
+      </a>
+      <a href="#respiracion" class="morning-nav__item" data-section="respiracion">
+        <span>◎</span> <span>Respirar</span>
+      </a>
+      <a href="#chakras"        class="morning-nav__item" data-section="chakras">
+        <span>✦</span> <span>Chakras</span>
+      </a>
+      <a href="#morning-journey" class="morning-nav__item" data-section="morning-journey">
+        <span>☀</span> <span>Mañana</span>
+      </a>
+      <a href="#lofi"            class="morning-nav__item" data-section="lofi">
+        <span>🐦</span> <span>Sonidos</span>
+      </a>
+      <a href="#lissajous"       class="morning-nav__item" data-section="lissajous">
+        <span>∿</span> <span>Ondas</span>
+      </a>
+      <a href="#alarma"          class="morning-nav__item" data-section="alarma">
+        <span>◷</span> <span>Alarma</span>
+      </a>
+      <!-- Collapse toggle -->
+      <button class="morning-nav__collapse-btn" id="nav-collapse-btn" aria-label="Colapsar menú">‹</button>
+    </nav>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 2: DASHBOARD DEL DÍA
+       Hello Janani style
+       ══════════════════════════════════════ -->
+  <section id="dashboard" class="section" aria-label="Dashboard del día">
+    <!-- Aura de fondo (Three.js) -->
+    <div class="dashboard__bg-aura" id="dashboard-aura-bg">
+      <div class="orb" id="dash-orb-1" style="width:280px;height:280px;top:40px;right:-60px;background:var(--color-personal-1);filter:blur(70px);opacity:0.35;position:absolute;border-radius:50%;animation:auraOrb1 10s ease-in-out infinite;"></div>
+      <div class="orb" id="dash-orb-2" style="width:200px;height:200px;top:200px;left:-80px;background:var(--color-personal-2);filter:blur(60px);opacity:0.3;position:absolute;border-radius:50%;animation:auraOrb2 12s ease-in-out infinite;"></div>
+      <div class="orb" id="dash-orb-3" style="width:150px;height:150px;top:60%;right:20%;background:var(--color-personal-3);filter:blur(50px);opacity:0.25;position:absolute;border-radius:50%;animation:auraOrb3 8s ease-in-out infinite;"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="dashboard__header">
+      <p class="dashboard__greeting-small" id="dash-modo-label">MODO MAÑANA</p>
+      <h2 class="dashboard__name">
+        Hola, <span id="dash-nombre">Franco</span><br/>
+        <span style="font-size:0.65em;font-weight:400;color:var(--text-secondary);">Resumen del día</span>
+      </h2>
+
+      <!-- Badge modo -->
+      <div style="margin-top:12px;">
+        <span class="dashboard__mode-badge badge--morning" id="dash-badge">
+          🌅 Mañana
+        </span>
+      </div>
+    </div>
+
+    <!-- Stats row (estilo referencia) -->
+    <div class="dashboard__stats">
+      <div>
+        <p class="dashboard__stat-num">
+          <span id="dash-stat-obras">06</span>
+          <span id="dash-stat-total">/12</span>
+        </p>
+        <p class="dashboard__stat-label">Obras exploradas</p>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🗓</div>
+      </div>
+    </div>
+
+    <!-- Card principal del día -->
+    <div class="day-card reveal-item">
+      <!-- Ícono SVG del día (chakra rotativo) -->
+      <div class="day-card__icon" id="day-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="28" stroke="rgba(0,0,0,0.08)" stroke-width="1.5"/>
+          <circle cx="32" cy="32" r="16" fill="var(--color-personal-1)" opacity="0.4"/>
+          <circle cx="32" cy="32" r="8" fill="var(--color-personal-1)" opacity="0.7"/>
+          <line x1="32" y1="4" x2="32" y2="12" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="32" y1="52" x2="32" y2="60" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="4" y1="32" x2="12" y2="32" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="52" y1="32" x2="60" y2="32" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <p class="day-card__label">FRASE DEL DÍA</p>
+      <p class="day-card__frase" id="dash-frase">
+        "El silencio no es vacío. Es la base de toda sabiduría."
+      </p>
+      <p class="day-card__autor" id="dash-autor">— Nisargadatta Maharaj</p>
+
+      <!-- CTA -->
+      <div class="day-card__cta">
+        <span style="font-size:var(--text-small);color:var(--text-secondary);">
+          Empezar hoy →
+        </span>
+        <button class="btn btn--pill" onclick="document.getElementById('challenge-card').scrollIntoView({behavior:'smooth'})">
+          Challenge
+        </button>
+      </div>
+    </div>
+
+    <!-- Challenge del día -->
+    <div class="card card--soft reveal-item stagger-2" id="challenge-card" style="margin:16px 24px 0;padding:20px;">
+      <p class="card__label">CHALLENGE DEL DÍA</p>
+      <p id="dash-challenge-pregunta" style="font-family:var(--font-display);font-size:1.1rem;font-weight:600;line-height:1.4;margin-bottom:8px;">
+        ¿Qué hábito mental te limita más?
+      </p>
+      <p id="dash-challenge-dato" style="font-size:var(--text-small);color:var(--text-secondary);line-height:var(--leading-body);margin-bottom:16px;">
+        Dato: El 95% de tus decisiones diarias vienen de patrones inconscientes formados antes de los 7 años.
+      </p>
+      <p id="dash-challenge-accion" style="font-size:var(--text-small);font-weight:600;color:var(--text-primary);">
+        → Escribí ese hábito y nombralo por primera vez.
+      </p>
+    </div>
+
+    <!-- Floating cards estilo "Good Morning" -->
+    <div class="dashboard__float-cards" style="margin-bottom:32px;">
+      <div class="float-card float-card--1">
+        <p style="font-size:var(--text-xs);color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Próxima práctica</p>
+        <p style="font-family:var(--font-display);font-size:1rem;font-weight:600;">Respiración 4-7-8</p>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:4px;">en cualquier momento</p>
+      </div>
+      <div class="float-card float-card--2">
+        <p style="font-size:var(--text-xs);color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Tu aura hoy</p>
+        <div style="width:40px;height:40px;border-radius:50%;background:radial-gradient(circle, var(--color-personal-1), var(--color-personal-2));opacity:0.8;margin-bottom:8px;"></div>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);">tiene que ver con el movimiento</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 3: VISUALISING WISDOM
+       Nisargadatta layout editorial
+       ══════════════════════════════════════ -->
+  <section id="visualising-wisdom" class="section" aria-label="Visualising Wisdom">
+    <!-- Header -->
+    <div class="wisdom__header">
+      <div class="wisdom__title-big reveal-item">I AM<br/>NOTHING</div>
+      <div style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted);text-align:right;letter-spacing:0.1em;line-height:2;">
+        WISDOM<br/>SABIDURÍA<br/>◈
+      </div>
+    </div>
+
+    <!-- Frame con canvas shader y palabras flotantes -->
+    <div class="wisdom__frame">
+      <!-- Canvas del shader de colores blur -->
+      <canvas class="wisdom__shader-canvas" id="wisdom-canvas"></canvas>
+
+      <!-- Categoría top -->
+      <div class="wisdom__category-top">( W I S D O M )</div>
+
+      <!-- Palabras numeradas como en la referencia -->
+      <div class="wisdom__words">
+        <span class="wisdom__word" data-num="1" style="top:15%;right:20%;">Between</span>
+        <span class="wisdom__word" data-num="2" style="top:30%;left:10%;">The</span>
+        <span class="wisdom__word" data-num="3" style="top:42%;left:35%;">Two</span>
+        <span class="wisdom__word" data-num="4" style="top:52%;left:42%;">My</span>
+        <span class="wisdom__word" data-num="5" style="top:65%;left:12%;">Life</span>
+        <span class="wisdom__word" data-num="6" style="top:77%;right:18%;">Moves</span>
+      </div>
+
+      <!-- Línea curva SVG conectando las palabras -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;" viewBox="0 0 380 320" preserveAspectRatio="none">
+        <path d="M 280 50 C 200 80, 80 120, 160 160 C 220 190, 80 240, 200 290"
+              fill="none"
+              stroke="rgba(26,26,26,0.5)"
+              stroke-width="1"
+              stroke-linecap="round"
+        />
+      </svg>
+
+      <!-- Categoría bottom -->
+      <div class="wisdom__category-bottom">( L O V E )</div>
+    </div>
+
+    <!-- Footer editorial -->
+    <div class="wisdom__footer">
+      <div class="wisdom__title-bottom reveal-item">I AM<br/>EVERYTHING</div>
+
+      <!-- Color strip como en la referencia -->
+      <div class="wisdom__color-strip">
+        <span style="background:#6B8E7A;"></span>
+        <span style="background:#8BAD9A;"></span>
+        <span style="background:#F5D89A;"></span>
+        <span style="background:#E8B86B;"></span>
+        <span style="background:#D4906A;"></span>
+        <span style="background:#C4622D;"></span>
+        <span style="background:#F4C2C2;"></span>
+        <span style="background:#A8E6E0;"></span>
+        <span style="background:#D4C5E8;"></span>
+        <span style="background:#B8D4B0;"></span>
+      </div>
+
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+        <span class="wisdom__author">NISARGADATTA<br/>MAHARAJ</span>
+        <p class="wisdom__quote">"Wisdom is knowing I am nothing, Love is knowing I am everything, and between the two my life moves."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 4: AJETREO SUR (Contexts)
+       Burbujas de color con Three.js
+       ══════════════════════════════════════ -->
+  <section id="ajetreo-sur" class="section" aria-label="Ajetreo Sur">
+    <!-- Canvas Three.js de burbujas -->
+    <canvas class="ajetreo__canvas" id="ajetreo-canvas"></canvas>
+
+    <!-- Header -->
+    <div class="ajetreo__header">
+      <div>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:2px;">←</p>
+        <p style="font-size:var(--text-xs);font-weight:600;color:var(--text-muted);">Contextos</p>
+      </div>
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:12px;">⌕</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="ajetreo__footer">
+      <div>
+        <p class="ajetreo__label">HOY</p>
+        <div style="display:flex;gap:2px;margin-top:4px;">
+          <span style="display:block;width:2px;height:14px;background:var(--text-muted);border-radius:1px;opacity:0.4;"></span>
+          <span style="display:block;width:2px;height:10px;background:var(--text-muted);border-radius:1px;opacity:0.3;"></span>
+          <span style="display:block;width:2px;height:16px;background:var(--text-muted);border-radius:1px;opacity:0.5;"></span>
+          <span style="display:block;width:2px;height:8px;background:var(--text-muted);border-radius:1px;opacity:0.2;"></span>
+          <span style="display:block;width:2px;height:12px;background:var(--text-muted);border-radius:1px;opacity:0.4;"></span>
+        </div>
+      </div>
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:12px;">⚙</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 5: BIBLIOTECA
+       Card flip 3D
+       ══════════════════════════════════════ -->
+  <section id="biblioteca" class="section" aria-label="Biblioteca">
+    <div class="section__inner">
+      <!-- Header -->
+      <div class="biblioteca__header">
+        <h2 class="t-title reveal-item">Biblioteca</h2>
+        <p class="t-subtitle reveal-item stagger-2" style="margin-top:4px;">
+          Obras que definen tu frecuencia
+        </p>
+
+        <!-- Filtros -->
+        <div class="filter-bar" style="margin-top:16px;margin-left:-24px;">
+          <button class="btn btn--pill active" data-filter="todos">Todos</button>
+          <button class="btn btn--pill" data-filter="filosofia">Filosofía</button>
+          <button class="btn btn--pill" data-filter="musica">Música</button>
+          <button class="btn btn--pill" data-filter="neuro">Neuro</button>
+          <button class="btn btn--pill" data-filter="yoga">Yoga</button>
+          <button class="btn btn--pill" data-filter="tech">Tech</button>
+        </div>
+      </div>
+
+      <!-- Grid de obras (generado por JS) -->
+      <div class="biblioteca__grid" id="obras-grid">
+        <!-- Obra 1: Kind of Blue -->
+        <div class="obra-card card-flip reveal-item" data-filter="musica" data-obra="0">
+          <div class="obra-card__front card-flip__front">
+            <div class="obra-card__image" style="height:calc(100% - 72px);">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#2d5016);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">🎷</div>
+            </div>
+            <div class="obra-card__info">
+              <p class="obra-card__title">Kind of Blue</p>
+              <p class="obra-card__sub">Miles Davis · 1959</p>
+            </div>
+          </div>
+          <div class="obra-card__back card-flip__back">
+            <span class="obra-card__tag">música / jazz / improvisación</span>
+            <div class="obra-card__notes">
+              <p>La improvisación modal libera la mente del pensamiento lineal.</p>
+              <p>Miles eliminó los acordes para que la melodía respirara sola.</p>
+              <p>La restricción crea libertad.</p>
+            </div>
+            <div class="obra-card__connections">
+              <button class="obra-card__conn-item">→ Gödel Escher Bach</button>
+              <button class="obra-card__conn-item">→ Taoísmo Wu Wei</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Obra 2: Gödel Escher Bach -->
+        <div class="obra-card card-flip reveal-item stagger-2" data-filter="neuro" data-obra="1">
+          <div class="obra-card__front card-flip__front">
+            <div class="obra-card__image" style="height:calc(100% - 72px);">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#F5D89A,#A8E6E0);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">∞</div>
+            </div>
+            <div class="obra-card__info">
+              <p class="obra-card__title">Gödel Escher Bach</p>
+              <p class="obra-card__sub">Hofstadter · 1979</p>
+            </div>
+          </div>
+          <div class="obra-card__back card-flip__back">
+            <span class="obra-card__tag">neuro / sistemas / paradoja</span>
+            <div class="obra-card__notes">
+              <p>Los bucles extraños son la base de la consciencia.</p>
+              <p>Matemática, música y arte son el mismo patrón infinito.</p>
+              <p>El yo es una ilusión recursiva que se observa a sí misma.</p>
+            </div>
+            <div class="obra-card__connections">
+              <button class="obra-card__conn-item">→ Kind of Blue</button>
+              <button class="obra-card__conn-item">→ Spinoza Ética</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Obra 3: Marco Aurelio -->
+        <div class="obra-card card-flip reveal-item stagger-3" data-filter="filosofia" data-obra="2">
+          <div class="obra-card__front card-flip__front">
+            <div class="obra-card__image" style="height:calc(100% - 72px);">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#2D5016,#1B2B4B);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--amarillo-marcador);">Ⅺ</div>
+            </div>
+            <div class="obra-card__info">
+              <p class="obra-card__title">Meditaciones</p>
+              <p class="obra-card__sub">Marco Aurelio · s.II</p>
+            </div>
+          </div>
+          <div class="obra-card__back card-flip__back">
+            <span class="obra-card__tag">filosofía / estoicismo / poder</span>
+            <div class="obra-card__notes">
+              <p>Un emperador que se escribía a sí mismo para no corromperse.</p>
+              <p>La disciplina del pensamiento como práctica diaria.</p>
+              <p>Lo que no puedes controlar no merece tu energía.</p>
+            </div>
+            <div class="obra-card__connections">
+              <button class="obra-card__conn-item">→ Epicteto Enquiridión</button>
+              <button class="obra-card__conn-item">→ Neuroplasticidad</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Obra 4: A Love Supreme -->
+        <div class="obra-card card-flip reveal-item stagger-4" data-filter="musica" data-obra="3">
+          <div class="obra-card__front card-flip__front">
+            <div class="obra-card__image" style="height:calc(100% - 72px);">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#D4C5E8,#F4C2C2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">✦</div>
+            </div>
+            <div class="obra-card__info">
+              <p class="obra-card__title">A Love Supreme</p>
+              <p class="obra-card__sub">Coltrane · 1965</p>
+            </div>
+          </div>
+          <div class="obra-card__back card-flip__back">
+            <span class="obra-card__tag">música / espiritualidad / jazz</span>
+            <div class="obra-card__notes">
+              <p>Coltrane grabó su agradecimiento a Dios en cuatro movimientos.</p>
+              <p>Resolución, Resolución, Perseguimiento, Salmo.</p>
+              <p>La música como ofrenda, no como producto.</p>
+            </div>
+            <div class="obra-card__connections">
+              <button class="obra-card__conn-item">→ Kind of Blue</button>
+              <button class="obra-card__conn-item">→ Chakra Corona</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 6: SCRATCH REVEAL
+       Rasca pegatinas de sabiduría
+       ══════════════════════════════════════ -->
+  <section id="scratch-reveal" class="section section--compact" aria-label="Descubrí sabiduría">
+    <div class="section__inner">
+      <h2 class="t-title reveal-item">Descubrí</h2>
+      <p class="t-subtitle reveal-item stagger-2">
+        Rascá para revelar
+      </p>
+
+      <div class="scratch-grid">
+        <!-- Scratch card 1 -->
+        <div class="scratch-card" id="sc-1">
+          <div class="scratch-card__content">
+            <p class="scratch-card__content-title">Física cuántica y Buda</p>
+            <p class="scratch-card__content-sub">Conexión sideral</p>
+          </div>
+          <canvas class="scratch-canvas" id="sc-canvas-1"></canvas>
+          <div class="scratch-card__overlay">
+            <p class="scratch-card__overlay-text">Rascá<br/>↓</p>
+          </div>
+        </div>
+
+        <!-- Scratch card 2 -->
+        <div class="scratch-card" id="sc-2">
+          <div class="scratch-card__content">
+            <p class="scratch-card__content-title">El azul no existía</p>
+            <p class="scratch-card__content-sub">Historia del lenguaje</p>
+          </div>
+          <canvas class="scratch-canvas" id="sc-canvas-2"></canvas>
+          <div class="scratch-card__overlay">
+            <p class="scratch-card__overlay-text">Rascá<br/>↓</p>
+          </div>
+        </div>
+
+        <!-- Scratch card 3 -->
+        <div class="scratch-card" id="sc-3">
+          <div class="scratch-card__content">
+            <p class="scratch-card__content-title">Por qué el 432 Hz</p>
+            <p class="scratch-card__content-sub">Frecuencia y naturaleza</p>
+          </div>
+          <canvas class="scratch-canvas" id="sc-canvas-3"></canvas>
+          <div class="scratch-card__overlay">
+            <p class="scratch-card__overlay-text">Rascá<br/>↓</p>
+          </div>
+        </div>
+
+        <!-- Scratch card 4 -->
+        <div class="scratch-card" id="sc-4">
+          <div class="scratch-card__content">
+            <p class="scratch-card__content-title">Fibonacci en todo</p>
+            <p class="scratch-card__content-sub">El patrón oculto</p>
+          </div>
+          <canvas class="scratch-canvas" id="sc-canvas-4"></canvas>
+          <div class="scratch-card__overlay">
+            <p class="scratch-card__overlay-text">Rascá<br/>↓</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 7: RESPIRACIÓN
+       Con shader nebulosa de fondo
+       ══════════════════════════════════════ -->
+  <section id="respiracion" class="section" aria-label="Ejercicio de respiración">
+    <!-- Canvas nebulosa shader -->
+    <canvas id="respiracion-canvas"></canvas>
+
+    <div class="respiracion__content">
+      <h2 class="t-title text-center reveal-item" style="margin-top:var(--space-xl);">Respira</h2>
+      <p class="t-subtitle text-center reveal-item stagger-2" style="color:var(--text-secondary);">
+        Tu ritmo. Tu paz.
+      </p>
+
+      <!-- Selector de modo -->
+      <div class="respiracion__modes reveal-item stagger-3">
+        <button class="btn btn--pill active" data-breath="478">4-7-8</button>
+        <button class="btn btn--pill" data-breath="box">Box</button>
+        <button class="btn btn--pill" data-breath="coherencia">Coherencia</button>
+      </div>
+
+      <!-- Círculo de respiración -->
+      <div class="respiracion__circle-wrap">
+        <!-- Rings de onda -->
+        <div class="respiracion__ring" style="width:300px;height:300px;"></div>
+        <div class="respiracion__ring" style="width:260px;height:260px;"></div>
+        <div class="respiracion__ring" style="width:220px;height:220px;"></div>
+
+        <!-- Círculo principal -->
+        <div class="respiracion__circle" id="breath-circle">
+          <p class="respiracion__text" id="breath-num">4</p>
+        </div>
+      </div>
+
+      <!-- Guía de texto -->
+      <p class="respiracion__guide" id="breath-guide">
+        Inhalar...
+      </p>
+
+      <!-- Botón inicio -->
+      <button id="breath-start" class="btn btn--ghost" style="margin-top:var(--space-xl);">
+        Iniciar respiración
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 8: MODOS DEL DÍA
+       ══════════════════════════════════════ -->
+
+  <!-- Modo Mañana -->
+  <section id="modo-manana" class="modo-section" aria-label="Modo Mañana">
+    <div class="orb" style="position:absolute;width:200px;height:200px;top:-40px;right:-40px;background:var(--accent-amber);filter:blur(60px);opacity:0.4;border-radius:50%;pointer-events:none;animation:auraOrb1 8s ease-in-out infinite;"></div>
+    <p class="modo__eyebrow reveal-item">06:00 → 12:00 · Modo Mañana</p>
+    <h2 class="modo__title reveal-item stagger-2">
+      La mañana<br/>no espera.
+    </h2>
+    <p class="modo__frase reveal-item stagger-3">
+      "Empieza donde estás. Usa lo que tenés.<br/>Hacé lo que podés."
+    </p>
+    <div class="modo__accion reveal-item stagger-4">
+      <span>→</span>
+      <span>10 minutos de movimiento antes de la pantalla</span>
+    </div>
+  </section>
+
+  <!-- Modo Tarde -->
+  <section id="modo-tarde" class="modo-section" aria-label="Modo Tarde">
+    <p class="modo__eyebrow reveal-item" style="opacity:0.5;">12:00 → 20:00 · Modo Tarde</p>
+    <h2 class="modo__title reveal-item stagger-2">
+      Conectar<br/>las ideas.
+    </h2>
+    <p class="modo__frase reveal-item stagger-3" style="color:rgba(255,228,77,0.8);">
+      "Todo lo que existe está conectado.<br/>Basta con mirar."
+    </p>
+    <div class="modo__accion reveal-item stagger-4" style="opacity:0.6;">
+      <span>→</span>
+      <span>Encontrá una conexión entre algo técnico y algo espiritual</span>
+    </div>
+    <!-- Nodos de conexión decorativos -->
+    <svg style="position:absolute;bottom:80px;right:24px;opacity:0.15;" width="80" height="80" viewBox="0 0 80 80">
+      <circle cx="40" cy="10" r="4" fill="var(--amarillo-marcador)"/>
+      <circle cx="10" cy="60" r="4" fill="var(--amarillo-marcador)"/>
+      <circle cx="70" cy="60" r="4" fill="var(--amarillo-marcador)"/>
+      <line x1="40" y1="10" x2="10" y2="60" stroke="var(--amarillo-marcador)" stroke-width="1"/>
+      <line x1="10" y1="60" x2="70" y2="60" stroke="var(--amarillo-marcador)" stroke-width="1"/>
+      <line x1="70" y1="60" x2="40" y2="10" stroke="var(--amarillo-marcador)" stroke-width="1"/>
+    </svg>
+  </section>
+
+  <!-- Modo Noche -->
+  <section id="modo-noche" class="modo-section" aria-label="Modo Noche">
+    <div class="orb" style="position:absolute;width:240px;height:240px;top:30%;left:-80px;background:var(--accent-lavanda);filter:blur(80px);opacity:0.25;border-radius:50%;pointer-events:none;animation:auraOrb2 12s ease-in-out infinite;"></div>
+    <p class="modo__eyebrow reveal-item" style="color:rgba(248,246,242,0.4);">20:00 → 06:00 · Modo Noche</p>
+    <h2 class="modo__title reveal-item stagger-2" style="color:var(--sec-noche-text);">
+      El día<br/>cerró.
+    </h2>
+    <p class="modo__frase reveal-item stagger-3" style="color:rgba(248,246,242,0.7);">
+      "No podés resolver un problema con el mismo nivel de consciencia que lo creó."
+    </p>
+    <p style="font-family:var(--font-mono);font-size:var(--text-xs);color:rgba(248,246,242,0.3);letter-spacing:0.15em;margin-top:var(--space-sm);" class="reveal-item stagger-4">— Einstein</p>
+    <div class="modo__accion reveal-item stagger-5" style="color:rgba(248,246,242,0.5);">
+      <span>→</span>
+      <span>¿Qué fue lo mejor del día?</span>
+    </div>
+  </section>
+
+  <!-- Modo Alucinaje -->
+  <section id="modo-alucinaje" class="modo-section" aria-label="Modo Alucinaje" data-mode="alucinaje">
+    <canvas id="alucinaje-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;"></canvas>
+
+    <!-- Textos flotantes de fondo -->
+    <p class="alucinaje__float-text" style="top:10%;left:5%;font-size:2rem;">∞</p>
+    <p class="alucinaje__float-text" style="top:30%;right:8%;font-size:1rem;animation-delay:1s;">fractal</p>
+    <p class="alucinaje__float-text" style="top:60%;left:15%;font-size:1.5rem;animation-delay:2s;">⚛</p>
+    <p class="alucinaje__float-text" style="bottom:20%;right:5%;font-size:0.8rem;animation-delay:0.5s;">neuroplasticidad</p>
+
+    <div style="position:relative;z-index:2;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-lg);">
+        <span style="font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.15em;opacity:0.6;">MODO ALUCINAJE</span>
+        <button id="alucinaje-toggle" class="badge" style="background:rgba(168,230,224,0.3);color:var(--accent-cyan);cursor:pointer;border:1px solid rgba(168,230,224,0.4);">ON</button>
+      </div>
+
+      <h2 class="modo__title" style="color:var(--accent-cyan);" id="alucinaje-title">
+        ¿Y si todo<br/>es uno?
+      </h2>
+
+      <p class="modo__frase" style="color:rgba(168,230,224,0.8);" id="alucinaje-frase">
+        "El universo no te hizo pasar por eso.<br/>El universo se pasó por vos."
+      </p>
+
+      <div class="modo__accion" style="color:rgba(168,230,224,0.6);">
+        <span>→</span>
+        <span id="alucinaje-conexion">Marco Aurelio + física cuántica + un álbum de 1965</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 9: CHAKRAS
+       ══════════════════════════════════════ -->
+  <section id="chakras" class="section" aria-label="Chakras">
+    <div class="section__inner">
+      <h2 class="t-title reveal-item">Chakras</h2>
+      <p class="t-subtitle reveal-item stagger-2">
+        Siete centros. Siete mundos.
+      </p>
+
+      <div class="chakras__list" style="margin-top:var(--space-xl);">
+        <!-- 7 chakras generados por JS desde chakras.json -->
+        <div class="chakra-item reveal-item" data-chakra="0">
+          <div class="chakra-item__orb" style="background:rgba(255,68,68,0.15);--chakra-color:rgba(255,68,68,0.4);">🔴</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Muladhara</p>
+            <p class="chakra-item__name">Raíz</p>
+            <p class="chakra-item__desc">Tierra, seguridad, instinto de supervivencia</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item stagger-2" data-chakra="1">
+          <div class="chakra-item__orb" style="background:rgba(255,140,0,0.15);--chakra-color:rgba(255,140,0,0.4);">🟠</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Svadhisthana</p>
+            <p class="chakra-item__name">Sacro</p>
+            <p class="chakra-item__desc">Creatividad, placer, emoción fluida</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item stagger-3" data-chakra="2">
+          <div class="chakra-item__orb" style="background:rgba(255,228,77,0.2);--chakra-color:rgba(255,228,77,0.5);">🟡</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Manipura</p>
+            <p class="chakra-item__name">Plexo Solar</p>
+            <p class="chakra-item__desc">Voluntad, poder personal, acción</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item stagger-4" data-chakra="3">
+          <div class="chakra-item__orb" style="background:rgba(184,212,176,0.2);--chakra-color:rgba(184,212,176,0.5);">💚</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Anahata</p>
+            <p class="chakra-item__name">Corazón</p>
+            <p class="chakra-item__desc">Amor, compasión, equilibrio</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item stagger-5" data-chakra="4">
+          <div class="chakra-item__orb" style="background:rgba(168,230,224,0.2);--chakra-color:rgba(168,230,224,0.5);">💙</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Vishuddha</p>
+            <p class="chakra-item__name">Garganta</p>
+            <p class="chakra-item__desc">Expresión, verdad, comunicación</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item stagger-6" data-chakra="5">
+          <div class="chakra-item__orb" style="background:rgba(100,149,237,0.2);--chakra-color:rgba(100,149,237,0.5);">🔵</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Ajna</p>
+            <p class="chakra-item__name">Tercer Ojo</p>
+            <p class="chakra-item__desc">Intuición, visión, sabiduría</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+
+        <div class="chakra-item reveal-item" style="transition-delay:0.7s;" data-chakra="6">
+          <div class="chakra-item__orb" style="background:rgba(212,197,232,0.3);--chakra-color:rgba(212,197,232,0.6);">🟣</div>
+          <div class="chakra-item__info">
+            <p class="chakra-item__name-sanskrit">Sahasrara</p>
+            <p class="chakra-item__name">Corona</p>
+            <p class="chakra-item__desc">Consciencia pura, conexión universal</p>
+          </div>
+          <span class="chakra-item__arrow">›</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 10: MANIFIESTOS
+       Dear Me style editorial
+       ══════════════════════════════════════ -->
+  <section id="manifiestos" class="section" aria-label="Manifiestos">
+    <!-- Hero manifiesto -->
+    <div class="manifiesto-hero">
+      <div class="manifiesto-hero__bg"></div>
+
+      <!-- Nav del manifiesto -->
+      <div class="manifiesto-hero__nav">
+        <span class="manifiesto-hero__brand">Apacheta</span>
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:14px;">◎</span>
+        </div>
+      </div>
+
+      <div class="manifiesto-hero__content">
+        <!-- Pills tabs -->
+        <div class="manifiesto-hero__eyebrow">
+          <button class="btn btn--pill active">Todos</button>
+          <button class="btn btn--pill">Filosofía</button>
+          <button class="btn btn--pill">Tech</button>
+        </div>
+
+        <h2 class="manifiesto-hero__title">
+          Escribí tu propia<br/><em>Biblia.</em><br/>
+          Nadie más puede hacerlo.
+        </h2>
+
+        <p class="manifiesto-hero__desc">
+          Capturá lo que te mueve, lo que te desafía, lo que te define. El sistema lo organiza solo.
+        </p>
+
+        <p class="manifiesto-hero__cta">Elegí tu primer tema</p>
+        <button class="btn btn--primary btn--full">Crear manifiesto →</button>
+      </div>
+    </div>
+
+    <!-- Manifiestos individuales -->
+    <article class="manifiesto-item manifiesto-item--filosofia" style="position:relative;overflow:hidden;">
+      <canvas class="manifiesto-particles" id="particles-filosofia" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
+      <p class="manifiesto-item__num" style="position:relative;z-index:1;">01 · FILOSOFÍA</p>
+      <h3 class="manifiesto-item__title" style="position:relative;z-index:1;">
+        El control es<br/>una ilusión útil.
+      </h3>
+      <div class="manifiesto-item__body" style="position:relative;z-index:1;">
+        <p>Los estoicos sabían algo que el siglo XXI redescubre: solo controlás tu respuesta. No el evento.</p>
+        <p>Marco Aurelio lideraba un imperio y aun así escribía: "Muy poco es necesario para una vida feliz; todo está dentro de vos mismo, en tu forma de pensar."</p>
+        <p>La neurociencia confirma: el cortisol baja cuando reencuadrás la situación, no cuando la resolvés.</p>
+      </div>
+    </article>
+
+    <article class="manifiesto-item manifiesto-item--tech" style="position:relative;overflow:hidden;">
+      <canvas class="manifiesto-particles" id="particles-tech" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
+      <p class="manifiesto-item__num" style="position:relative;z-index:1;">02 · TECH</p>
+      <h3 class="manifiesto-item__title" style="position:relative;z-index:1;">
+        El código es<br/>pensamiento formalizado.
+      </h3>
+      <div class="manifiesto-item__body" style="position:relative;z-index:1;">
+        <p>Programar no es escribir instrucciones. Es estructurar ideas en el único lenguaje que no admite ambigüedad.</p>
+        <p>Cada función bien nombrada es una idea claramente pensada. Cada abstracción, una comprensión más profunda del problema.</p>
+        <p>El código que se lee fácil es el que fue pensado difícil.</p>
+      </div>
+    </article>
+
+    <article class="manifiesto-item" style="background:var(--bg-cream);">
+      <p class="manifiesto-item__num" style="color:var(--text-muted);">03 · EMOCIONAL</p>
+      <h3 class="manifiesto-item__title">
+        Sentir no es<br/>debilidad.
+      </h3>
+      <div class="manifiesto-item__body" style="color:var(--text-secondary);">
+        <p>La inteligencia emocional no es suprimir lo que sentís. Es reconocerlo con nombre y no ser gobernado por ello.</p>
+        <p>Nombralo: ansiedad, euforia, nostalgia. Cuando lo nombrás, dejás de ser el sentimiento y empezás a tenerlo.</p>
+        <p>El observador no es lo observado.</p>
+      </div>
+    </article>
+
+    <article class="manifiesto-item manifiesto-item--alucinaje">
+      <p class="manifiesto-item__num" style="color:var(--accent-cyan);opacity:0.6;">04 · ALUCINAJE</p>
+      <h3 class="manifiesto-item__title">
+        ¿Y si el universo<br/>aprendió a verte?
+      </h3>
+      <div class="manifiesto-item__body" style="color:rgba(168,230,224,0.8);">
+        <p>Heráclito dijo que no podés entrar dos veces al mismo río. El budismo zen agrega: tampoco sos el mismo que entra.</p>
+        <p>La física cuántica no desmiente la espiritualidad. La formaliza con ecuaciones.</p>
+        <p>Cada observación colapsa la función de onda. Cada vez que prestás atención, creás realidad.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 11: CALENDAR + NOTAS
+       ══════════════════════════════════════ -->
+  <section id="calendar" class="section" aria-label="Calendario y notas">
+    <div class="section__inner">
+      <h2 class="t-title reveal-item">Esta semana</h2>
+      <p class="t-subtitle reveal-item stagger-2" style="margin-bottom:var(--space-xl);">
+        Tu historia en días
+      </p>
+
+      <!-- Días de la semana -->
+      <div class="calendar__week">
+        <div class="calendar__day-name">L</div>
+        <div class="calendar__day-name">M</div>
+        <div class="calendar__day-name">X</div>
+        <div class="calendar__day-name">J</div>
+        <div class="calendar__day-name">V</div>
+        <div class="calendar__day-name">S</div>
+        <div class="calendar__day-name">D</div>
+      </div>
+      <div class="calendar__week" id="calendar-days">
+        <!-- Generado por JS -->
+      </div>
+
+      <!-- Grid de notas -->
+      <p class="card__label" style="margin-top:var(--space-xl);margin-bottom:var(--space-md);">NOTAS RECIENTES</p>
+      <div class="notas-grid" id="notas-grid">
+        <!-- Generadas por JS desde localStorage -->
+        <div class="nota-card nota-card--amarilla">
+          <p class="nota-card__date">Hoy · 9:41am</p>
+          <p class="nota-card__text">La restricción crea libertad. Kind of Blue lo prueba.</p>
+        </div>
+        <div class="nota-card nota-card--cyan">
+          <p class="nota-card__date">Ayer</p>
+          <p class="nota-card__text">Neuroplasticidad: el cerebro cambia hasta el último día.</p>
+        </div>
+        <div class="nota-card nota-card--rosa">
+          <p class="nota-card__date">Lunes</p>
+          <p class="nota-card__text">Conectar lo técnico con lo espiritual es el ejercicio del día.</p>
+        </div>
+        <div class="nota-card nota-card--lavanda">
+          <p class="nota-card__date">Domingo</p>
+          <p class="nota-card__text">Coltrane grabó su gratitud a Dios en cuatro movimientos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 12: FRASES / SABIDURÍA
+       Editorial + aura
+       ══════════════════════════════════════ -->
+  <section id="frases" class="section" aria-label="Frases de sabiduría">
+    <!-- Frase 1 -->
+    <div class="frase-hero">
+      <div class="frase-hero__aura"></div>
+      <p class="frase-hero__num">01 / 07</p>
+      <p class="frase-hero__text">
+        "Hacé del presente tu amigo,<br/>
+        no tu enemigo.<br/>
+        <em>Aquí está todo lo que necesitás.</em>"
+      </p>
+      <p class="frase-hero__author">Eckhart Tolle</p>
+    </div>
+
+    <!-- Frase 2 -->
+    <div class="frase-hero" style="background:var(--bg-soft);">
+      <div class="frase-hero__aura" style="background:radial-gradient(circle, var(--accent-sage) 0%, transparent 70%);"></div>
+      <p class="frase-hero__num" style="color:var(--text-muted);">02 / 07</p>
+      <p class="frase-hero__text">
+        "No buscás lo que querés.<br/>
+        Buscás lo que sentís<br/>
+        <em>que merecés.</em>"
+      </p>
+      <p class="frase-hero__author">Jim Carrey</p>
+    </div>
+
+    <!-- Frase 3 -->
+    <div class="frase-hero" style="background:var(--sec-filosofia-bg);color:var(--sec-filosofia-text);">
+      <div class="frase-hero__aura" style="background:radial-gradient(circle, rgba(255,228,77,0.3) 0%, transparent 70%);"></div>
+      <p class="frase-hero__num" style="color:rgba(255,228,77,0.5);">03 / 07</p>
+      <p class="frase-hero__text" style="color:var(--sec-filosofia-text);">
+        "Amas lo que no podés controlar.<br/>
+        Controlas lo que<br/>
+        <em>decidís no amar.</em>"
+      </p>
+      <p class="frase-hero__author" style="color:rgba(255,228,77,0.6);">Marco Aurelio · Meditaciones</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 13: CONEXIONES CULTURALES
+       ══════════════════════════════════════ -->
+  <section id="conexiones" class="section section--compact" aria-label="Conexiones culturales">
+    <!-- Canvas para Three.js orbs -->
+    <canvas class="conexiones__canvas" id="conexiones-canvas"></canvas>
+
+    <div class="conexiones__content">
+      <h2 class="t-title reveal-item">Conexiones</h2>
+      <p class="t-subtitle reveal-item stagger-2">
+        Un concepto, tres culturas
+      </p>
+
+      <!-- Selector de culturas -->
+      <div class="conexiones__culturas reveal-item stagger-3">
+        <button class="cultura-orb" data-cultura="griega">Griega</button>
+        <button class="cultura-orb" data-cultura="azteca">Azteca</button>
+        <button class="cultura-orb selected" data-cultura="oriental">Oriental</button>
+        <button class="cultura-orb" data-cultura="andina">Andina</button>
+        <button class="cultura-orb" data-cultura="africana">Africana</button>
+      </div>
+
+      <!-- Concepto seleccionado -->
+      <div style="margin:var(--space-xl) 0;padding:var(--space-lg);background:var(--bg-primary);border-radius:var(--radius-lg);box-shadow:var(--shadow-xs);">
+        <p class="card__label">CONCEPTO DEL DÍA</p>
+        <p id="conexion-concepto" style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;line-height:var(--leading-title);">
+          El naranja fue el primer pigmento humano
+        </p>
+      </div>
+
+      <!-- Perspectivas -->
+      <div class="conexion-perspectivas reveal-item stagger-4">
+        <div class="perspectiva-card">
+          <p class="perspectiva-card__cultura">Oriental</p>
+          <p class="perspectiva-card__text">En el budismo, el naranja es el color de los monjes que renunciaron al ego. El pigmento más primitivo tomado como el símbolo de la mayor transformación espiritual.</p>
+        </div>
+
+        <div class="perspectiva-card">
+          <p class="perspectiva-card__cultura">Griega</p>
+          <p class="perspectiva-card__text">Los griegos no tenían palabra para "naranja". Lo llamaban ξανθός — entre amarillo y dorado. El lenguaje crea la percepción, no al revés.</p>
+        </div>
+
+        <div class="perspectiva-card">
+          <p class="perspectiva-card__cultura">Andina</p>
+          <p class="perspectiva-card__text">El achiote, pigmento anaranjado de la selva, era usado en rituales para conectar mundos. El color como puente, no como decoración.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 16: MENTE / CONSCIENCIA
+       Tipografía cinética + micro cards
+       ══════════════════════════════════════ -->
+  <section id="mente" class="section mente-section" aria-label="Mente" data-invite="seguí bajando">
+
+    <!-- Canvas fondo de orbes animados -->
+    <canvas id="mente-canvas" class="mente-canvas" aria-hidden="true"></canvas>
+
+    <!-- Texto vertical lateral izquierdo -->
+    <div class="mente-side-text">ESTADO DE CONSCIENCIA</div>
+
+    <!-- Contenido principal -->
+    <div class="mente-content">
+      <!-- Burbuja con nombre -->
+      <div class="mente-name-bubble" id="mente-name-bubble">—</div>
+
+      <!-- Palabras cinéticas -->
+      <div class="mente-word-track" id="mente-word-track"></div>
+
+      <!-- Micro-líneas decorativas -->
+      <div class="mente-lines">
+        <span></span><span></span><span></span>
+      </div>
+
+      <!-- Subtexto con punto -->
+      <div class="mente-subwords">
+        <span class="mente-subword mente-subword--main">b r e a t h e .</span>
+        <span class="mente-subword mente-subword--alt">— presencia</span>
+        <span class="mente-subword mente-subword--alt">— silencio</span>
+      </div>
+
+      <!-- Badge de estado -->
+      <div class="mente-badge">
+        <span class="mente-badge__dot"></span>
+        <span id="mente-state-label">ahora</span>
+      </div>
+    </div>
+
+    <!-- Cards de conceptos (scroll horizontal) -->
+    <div class="mente-cards-scroll">
+      <div class="mente-cards-track" id="mente-cards-track"></div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 17: SOPLAR
+       Web Audio API blow detection
+       ══════════════════════════════════════ -->
+  <section id="soplar" class="section soplar-section" aria-label="Soplar" data-invite="deslizá">
+
+    <canvas id="soplar-canvas" class="soplar-canvas" aria-hidden="true"></canvas>
+
+    <div class="section__inner" style="position:relative;z-index:2;align-items:center;text-align:center;">
+      <!-- Texto vertical derecho -->
+      <div class="side-text-right">ENERGÍA</div>
+
+      <p class="section-eyebrow">RITUAL</p>
+      <h2 class="section-title soplar-title">
+        <span class="word-letter">o</span><span class="word-letter">m</span><span class="word-letter" style="color:var(--color-personal-1)">.</span>
+      </h2>
+      <p class="soplar-sub" id="soplar-label">Cargá tu energía. Hablá hacia el micrófono.</p>
+
+      <!-- Orb que crece con el soplido -->
+      <div class="soplar-orb-wrap">
+        <div class="soplar-orb" id="soplar-orb">
+          <div class="soplar-orb__ring"></div>
+          <div class="soplar-orb__ring" style="animation-delay:0.5s"></div>
+          <div class="soplar-orb__ring" style="animation-delay:1s"></div>
+        </div>
+      </div>
+
+      <!-- Barra de energía -->
+      <div class="soplar-bar-track">
+        <div class="soplar-bar-fill" id="soplar-bar-fill" style="width:0%"></div>
+        <div class="soplar-bar-labels">
+          <span>vacío</span><span>flujo</span><span>lleno</span>
+        </div>
+      </div>
+
+      <button class="btn btn--primary soplar-btn" id="soplar-start">
+        Activar micrófono · Ritual Om
+      </button>
+
+      <!-- Reward post-soplido (oculto) -->
+      <div class="soplar-reward" id="soplar-reward" style="display:none;">
+        <p class="soplar-reward__text">Tu energía está cargada.</p>
+        <p class="soplar-reward__quote">"El aliento es el puente entre la mente y el cuerpo."</p>
+        <p class="soplar-reward__autor">— Thich Nhat Hanh</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 18: AURA COMPOSER
+       MIDI sliders → Canvas aura en vivo
+       ══════════════════════════════════════ -->
+  <section id="aura-composer" class="section" aria-label="Aura Composer" data-invite="componé tu aura">
+
+    <div class="section__inner">
+      <div class="aura-composer-header">
+        <p class="section-eyebrow">COMPOSER</p>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <h2 class="section-title" style="font-size:var(--text-title);">tu</h2>
+          <h2 class="section-title" style="font-size:var(--text-display);line-height:0.9;">aura</h2>
+        </div>
+        <p style="font-size:var(--text-small);color:var(--text-muted);margin-top:4px;">
+          Dominante: <strong id="aura-dominant">〜 calma</strong>
+        </p>
+      </div>
+
+      <!-- Canvas visualización del aura -->
+      <div class="aura-canvas-wrap">
+        <canvas id="aura-canvas" class="aura-canvas"></canvas>
+        <div class="aura-canvas-label">frecuencia en tiempo real</div>
+      </div>
+
+      <!-- Sliders MIDI style -->
+      <div class="aura-sliders" id="aura-sliders"></div>
+
+      <button class="btn btn--primary btn--full" id="aura-save" style="margin-top:var(--space-lg);">
+        Guardar mi aura
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 19: MANDALA
+       Canvas interactivo de dibujo simétrico
+       ══════════════════════════════════════ -->
+  <section id="mandala" class="section mandala-section" aria-label="Mandala">
+
+    <div class="section__inner" style="align-items:center;">
+      <div style="display:flex;align-items:center;gap:var(--space-md);width:100%;margin-bottom:var(--space-sm);">
+        <div>
+          <p class="section-eyebrow">PATRÓN</p>
+          <h2 class="section-title" style="font-size:var(--text-title);">el mandala</h2>
+          <p style="font-size:var(--text-small);color:var(--text-muted);">trazá · repetí · trascendé</p>
+        </div>
+        <!-- Texto vertical -->
+        <div class="mandala-side-label">SIMETRÍA × 8</div>
+      </div>
+
+      <div class="mandala-canvas-wrap">
+        <canvas id="mandala-canvas" class="mandala-canvas"></canvas>
+        <p class="mandala-hint">tocá y dibujá · tu trazo se multiplica</p>
+      </div>
+
+      <div class="mandala-controls">
+        <button class="btn btn--ghost" id="mandala-clear">◻ limpiar</button>
+        <button class="btn btn--primary" id="mandala-save">↓ guardar imagen</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 20: MATE GLB + EXPERIMENTAL
+       3D viewer · deslizá para modo bot
+       ══════════════════════════════════════ -->
+  <section id="glb-mate" class="section glb-mate-section" aria-label="El Mate">
+
+    <!-- Fondo gradiente animado -->
+    <div class="glb-mate__bg">
+      <div class="orb parallax-layer" data-depth="0.8" style="width:260px;height:260px;top:5%;right:-60px;background:var(--color-personal-1);filter:blur(80px);opacity:0.25;position:absolute;border-radius:50%;"></div>
+      <div class="orb parallax-layer" data-depth="0.4" style="width:200px;height:200px;bottom:20%;left:-40px;background:var(--color-personal-2);filter:blur(60px);opacity:0.2;position:absolute;border-radius:50%;"></div>
+    </div>
+
+    <!-- Canvas Three.js -->
+    <canvas id="mate-canvas" class="mate-canvas" aria-label="Mate 3D"></canvas>
+
+    <!-- Textos overlay -->
+    <div class="mate-overlay">
+      <p class="section-eyebrow" style="color:rgba(255,255,255,0.5);">RITUAL</p>
+      <h2 class="section-title" style="color:#fff;">el mate</h2>
+      <p style="font-size:var(--text-small);color:rgba(255,255,255,0.5);">el círculo del saber compartido</p>
+
+      <!-- Hint de swipe -->
+      <div class="mate-swipe-hint" id="mate-swipe-hint">
+        <span>deslizá →</span>
+        <span class="mate-swipe-arrow">→</span>
+      </div>
+
+      <button class="btn btn--ghost mate-exp-btn" id="mate-open-experimental"
+        style="color:#fff;border-color:rgba(255,255,255,0.25);margin-top:var(--space-xl);">
+        ⌬ modo experimental
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       PANEL EXPERIMENTAL (full-screen overlay)
+       Se abre desde el GLB mate
+       ══════════════════════════════════════ -->
+  <div id="experimental-panel" class="experimental-panel" role="dialog" aria-modal="true" aria-label="Modo Experimental">
+
+    <!-- Header -->
+    <div class="exp-header">
+      <div class="exp-header__left">
+        <div class="exp-status-dot"></div>
+        <span class="exp-status-label">modo experimental</span>
+      </div>
+      <button id="exp-close" class="exp-close" aria-label="Cerrar">✕</button>
+    </div>
+
+    <!-- Título -->
+    <div class="exp-title-block">
+      <p class="exp-eyebrow">APACHETA · AI FRAGMENT</p>
+      <h2 class="exp-title">Explorar<br/><em>adentro.</em></h2>
+      <p class="exp-sub">Fragmento experimental. Respuestas filosóficas.</p>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="exp-messages" id="exp-messages"></div>
+
+    <!-- Input -->
+    <div class="exp-input-wrap">
+      <input
+        type="text"
+        class="exp-input"
+        id="exp-input"
+        placeholder="preguntá algo…"
+        autocomplete="off"
+      />
+      <button class="exp-send" id="exp-send" aria-label="Enviar">
+        <span class="exp-send-icon">→</span>
+      </button>
+    </div>
+
+    <!-- Disclaimer -->
+    <p class="exp-disclaimer">fragmento · no reemplaza orientación profesional</p>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 14: ANOTACIÓN RÁPIDA
+       FAB + Modal Sheet (siempre disponible)
+       ══════════════════════════════════════ -->
+  <!-- Post-it minimizado (aparece cuando hay notas guardadas) -->
+  <div class="postit-mini" id="postit-mini" style="display:none;">
+    <p style="font-size:var(--text-xs);font-weight:600;margin-bottom:2px;">Nota rápida</p>
+    <p id="postit-preview" style="font-size:0.7rem;color:rgba(0,0,0,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></p>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab-anotacion" aria-label="Nueva anotación" title="Nueva anotación">
+    +
+  </button>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay" id="modal-overlay" aria-hidden="true"></div>
+
+  <!-- Modal sheet: Anotación -->
+  <div class="modal-sheet" id="anotacion-modal" role="dialog" aria-label="Anotación rápida" aria-modal="true">
+    <div class="modal-sheet__handle"></div>
+    <div class="anotacion-sheet">
+      <h3 class="anotacion-sheet__title">Anotación rápida</h3>
+
+      <textarea
+        class="anotacion-sheet__textarea"
+        id="anotacion-text"
+        placeholder="Lo que se te cruzó ahora mismo… una idea, una conexión, un dato sideral…"
+        rows="5"
+      ></textarea>
+
+      <!-- Tags sugeridos -->
+      <div class="anotacion-sheet__tags" id="anotacion-tags">
+        <button class="anotacion-tag" data-tag="filosofia">filosofía</button>
+        <button class="anotacion-tag" data-tag="tech">tech</button>
+        <button class="anotacion-tag" data-tag="emocional">emocional</button>
+        <button class="anotacion-tag" data-tag="sideral">sideral</button>
+        <button class="anotacion-tag" data-tag="musical">musical</button>
+        <button class="anotacion-tag" data-tag="yoga">yoga</button>
+      </div>
+
+      <div class="anotacion-sheet__actions">
+        <button class="btn btn--primary btn--full" id="save-anotacion">
+          Guardar como post-it
+        </button>
+        <button class="btn btn--ghost btn--full" id="save-manifiesto">
+          Convertir a manifiesto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 21: LISSAJOUS
+       Curva interactiva frecuencias A+B
+       ══════════════════════════════════════ -->
+  <section id="lissajous" class="section lissajous-section" aria-label="Lissajous" data-invite="ajustá las frecuencias">
+    <canvas id="lissajous-canvas" class="lissajous-canvas" aria-hidden="true"></canvas>
+    <div class="section__inner lissajous-inner">
+      <div class="lissajous-header">
+        <p class="section-eyebrow">GEOMETRÍA VIVA</p>
+        <h2 class="section-title" style="font-size:var(--text-title);">lissajous.</h2>
+        <p style="font-size:var(--text-small);color:var(--text-muted);line-height:var(--leading-body);">
+          Dos frecuencias. Una danza. La misma física que el sonido, la luz y el corazón.
+        </p>
+      </div>
+      <div class="lissajous-controls">
+        <div class="lissajous-freq-row">
+          <label class="lissajous-freq-label">
+            <span>Frecuencia A:</span>
+            <strong id="lissajous-a-val">2.0</strong>
+          </label>
+          <input type="range" id="lissajous-freq-a" class="lissajous-slider" min="1" max="10" step="0.5" value="2">
+        </div>
+        <div class="lissajous-freq-row">
+          <label class="lissajous-freq-label">
+            <span>Frecuencia B:</span>
+            <strong id="lissajous-b-val">1.0</strong>
+          </label>
+          <input type="range" id="lissajous-freq-b" class="lissajous-slider" min="1" max="10" step="0.5" value="1">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 22: FIBONACCI
+       Espiral aurea animada con texto
+       ══════════════════════════════════════ -->
+  <section id="fibonacci" class="section fibonacci-section" aria-label="Fibonacci">
+    <canvas id="fibonacci-canvas" class="fibonacci-canvas" aria-hidden="true"></canvas>
+    <div class="section__inner fibonacci-inner">
+      <p class="section-eyebrow">PROPORCIÓN ÁUREA</p>
+      <h2 class="section-title" style="font-size:var(--text-title);">fibonacci.</h2>
+      <p style="font-size:var(--text-small);color:var(--text-muted);line-height:var(--leading-body);margin-bottom:var(--space-lg);">
+        1, 1, 2, 3, 5, 8, 13... La naturaleza cuenta siempre igual.
+      </p>
+      <div id="fibonacci-quote" class="fibonacci-quote">
+        <p class="fibonacci-quote__text">"La belleza emerge cuando el orden y el caos se equilibran en proporción perfecta."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 23: MORNING JOURNEY
+       Diario de gratitud estilo Calm
+       ══════════════════════════════════════ -->
+  <section id="morning-journey" class="section morning-section" aria-label="Morning Journey" data-invite="escribí tu mañana">
+    <div class="morning-bg"></div>
+    <div class="section__inner morning-inner">
+      <div class="morning-date-header">
+        <p class="section-eyebrow">MORNING JOURNEY</p>
+        <p class="morning-date-day" id="morning-day">Lunes</p>
+        <p class="morning-date-full" id="morning-date-full">14 de abril, 2026</p>
+        <div class="morning-nav-arrows">
+          <button id="morning-prev" aria-label="Día anterior">‹</button>
+          <button id="morning-next" aria-label="Día siguiente">›</button>
+        </div>
+      </div>
+
+      <div class="morning-prompts" id="morning-prompts">
+        <div class="morning-prompt-group">
+          <p class="morning-prompt-label">SOY AGRADECIDO/A POR...</p>
+          <textarea class="morning-field" data-key="gratitud_1" placeholder="algo pequeño de hoy…" rows="2"></textarea>
+          <textarea class="morning-field" data-key="gratitud_2" placeholder="una persona…" rows="2"></textarea>
+          <textarea class="morning-field" data-key="gratitud_3" placeholder="algo de mi cuerpo o mente…" rows="2"></textarea>
+        </div>
+
+        <div class="morning-prompt-group">
+          <p class="morning-prompt-label">¿QUÉ HARÍA HOY GRANDIOSO?</p>
+          <textarea class="morning-field" data-key="grandioso_1" placeholder="una intención…" rows="2"></textarea>
+          <textarea class="morning-field" data-key="grandioso_2" placeholder="un paso concreto…" rows="2"></textarea>
+        </div>
+
+        <div class="morning-prompt-group">
+          <p class="morning-prompt-label">AFIRMACIÓN DEL DÍA</p>
+          <textarea class="morning-field" data-key="afirmacion" placeholder="Soy…" rows="2"></textarea>
+        </div>
+
+        <div class="morning-prompt-group">
+          <p class="morning-prompt-label">COSAS INCREÍBLES QUE PASARON HOY</p>
+          <textarea class="morning-field" data-key="highlights" placeholder="al final del día, anotá lo que viviste…" rows="3"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--full" id="morning-save" style="margin-top:var(--space-lg);">
+        Guardar día ✦
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 24: OJO / MEDITACIÓN
+       Animación cierra-ojos + vibración chakras
+       ══════════════════════════════════════ -->
+  <section id="meditacion-ojo" class="section meditation-eye-section" aria-label="Meditación">
+    <div class="eye-bg" id="eye-bg"></div>
+    <div class="section__inner meditation-inner">
+      <p class="section-eyebrow" style="color:rgba(212,197,232,0.6);">PRESENCIA</p>
+      <h2 class="section-title meditation-title">cerrar<br/>los ojos.</h2>
+      <p class="meditation-sub">Seguí la animación. El cuerpo sabe.</p>
+
+      <!-- Animación del ojo SVG -->
+      <div class="eye-container" id="eye-container">
+        <svg class="eye-svg" id="eye-svg" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Upper lid path -->
+          <path id="eye-lid-top" d="M10,50 Q100,5 190,50" fill="none" stroke="rgba(212,197,232,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Lower lid path -->
+          <path id="eye-lid-bottom" d="M10,50 Q100,95 190,50" fill="none" stroke="rgba(212,197,232,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Iris -->
+          <circle id="eye-iris" cx="100" cy="50" r="22" fill="none" stroke="rgba(212,197,232,0.7)" stroke-width="2"/>
+          <!-- Pupil -->
+          <circle id="eye-pupil" cx="100" cy="50" r="10" fill="rgba(212,197,232,0.4)"/>
+          <!-- Inner light -->
+          <circle cx="106" cy="44" r="4" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+      </div>
+
+      <p class="eye-instruction" id="eye-instruction">tocá para comenzar</p>
+
+      <!-- Chakra vibration sequence display -->
+      <div class="chakra-sequence" id="chakra-sequence">
+        <div class="chakra-seq-dot" data-chakra="0" style="background:#FF4444"></div>
+        <div class="chakra-seq-dot" data-chakra="1" style="background:#FF8C00"></div>
+        <div class="chakra-seq-dot" data-chakra="2" style="background:#FFE44D"></div>
+        <div class="chakra-seq-dot" data-chakra="3" style="background:#B8D4B0"></div>
+        <div class="chakra-seq-dot" data-chakra="4" style="background:#A8E6E0"></div>
+        <div class="chakra-seq-dot" data-chakra="5" style="background:#6495ED"></div>
+        <div class="chakra-seq-dot" data-chakra="6" style="background:#D4C5E8"></div>
+      </div>
+
+      <button class="btn btn--ghost meditation-btn" id="meditation-start"
+        style="border-color:rgba(212,197,232,0.4);color:rgba(212,197,232,0.9);margin-top:var(--space-xl);">
+        iniciar viaje
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 25: LOFI / AMBIENT SOUNDS
+       Player de sonidos ambientales animado
+       ══════════════════════════════════════ -->
+  <section id="lofi" class="section lofi-section" aria-label="Sonidos ambientales" data-invite="escuchá">
+    <canvas id="lofi-canvas" class="lofi-canvas" aria-hidden="true"></canvas>
+    <div class="section__inner lofi-inner">
+      <p class="section-eyebrow" style="color:rgba(168,230,224,0.6);">AMBIENTE</p>
+      <h2 class="section-title lofi-title">birdsong.</h2>
+      <p class="lofi-sub">Sonidos que calman el sistema nervioso.</p>
+
+      <!-- Animated birds SVG -->
+      <div class="lofi-birds" id="lofi-birds" aria-hidden="true">
+        <svg class="lofi-bird lofi-bird--1" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 12 Q10 4 20 12 Q10 8 2 12Z" fill="rgba(168,230,224,0.8)"/>
+          <path d="M20 12 Q30 4 38 12 Q30 8 20 12Z" fill="rgba(168,230,224,0.6)"/>
+          <circle cx="6" cy="11" r="1.5" fill="rgba(168,230,224,0.9)"/>
+        </svg>
+        <svg class="lofi-bird lofi-bird--2" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 12 Q10 4 20 12 Q10 8 2 12Z" fill="rgba(212,197,232,0.8)"/>
+          <path d="M20 12 Q30 4 38 12 Q30 8 20 12Z" fill="rgba(212,197,232,0.6)"/>
+          <circle cx="6" cy="11" r="1.5" fill="rgba(212,197,232,0.9)"/>
+        </svg>
+        <svg class="lofi-bird lofi-bird--3" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 12 Q10 4 20 12 Q10 8 2 12Z" fill="rgba(245,216,154,0.8)"/>
+          <path d="M20 12 Q30 4 38 12 Q30 8 20 12Z" fill="rgba(245,216,154,0.6)"/>
+          <circle cx="6" cy="11" r="1.5" fill="rgba(245,216,154,0.9)"/>
+        </svg>
+      </div>
+
+      <!-- Selector de sonido -->
+      <div class="lofi-sounds-grid" id="lofi-sounds-grid">
+        <button class="lofi-sound-btn active" data-sound="birds" id="lofi-btn-birds">
+          <span class="lofi-sound-icon">🐦</span>
+          <span>pájaros</span>
+        </button>
+        <button class="lofi-sound-btn" data-sound="rain" id="lofi-btn-rain">
+          <span class="lofi-sound-icon">🌧</span>
+          <span>lluvia</span>
+        </button>
+        <button class="lofi-sound-btn" data-sound="ocean" id="lofi-btn-ocean">
+          <span class="lofi-sound-icon">🌊</span>
+          <span>océano</span>
+        </button>
+        <button class="lofi-sound-btn" data-sound="fire" id="lofi-btn-fire">
+          <span class="lofi-sound-icon">🔥</span>
+          <span>fuego</span>
+        </button>
+      </div>
+
+      <!-- Timer y controles -->
+      <div class="lofi-controls">
+        <div class="lofi-timer-wrap">
+          <span class="lofi-timer-label">duración</span>
+          <div class="lofi-timer-btns">
+            <button class="lofi-timer-btn active" data-mins="5">5m</button>
+            <button class="lofi-timer-btn" data-mins="15">15m</button>
+            <button class="lofi-timer-btn" data-mins="30">30m</button>
+            <button class="lofi-timer-btn" data-mins="60">1h</button>
+          </div>
+        </div>
+        <button class="btn btn--primary lofi-play-btn" id="lofi-play">
+          ▶ comenzar
+        </button>
+      </div>
+
+      <p class="lofi-playing-label" id="lofi-playing-label" style="display:none;">
+        <span class="lofi-playing-dot"></span>
+        <span id="lofi-time-remaining">05:00</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 26: AURA HISTORY
+       Timeline horizontal de auras guardadas
+       ══════════════════════════════════════ -->
+  <section id="aura-history" class="section aura-history-section" aria-label="Historial de aura">
+    <div class="section__inner">
+      <p class="section-eyebrow">TU ENERGÍA EN EL TIEMPO</p>
+      <h2 class="section-title" style="font-size:var(--text-title);">historial<br/>de aura.</h2>
+      <p style="font-size:var(--text-small);color:var(--text-muted);margin-bottom:var(--space-lg);">
+        Tu vibración, día a día.
+      </p>
+      <!-- Cards horizontales de días -->
+      <div class="aura-history-scroll" id="aura-history-scroll">
+        <!-- Generado por JS -->
+        <div class="aura-history-empty" id="aura-history-empty">
+          <p>Guardá tu primera aura para verla aquí.</p>
+          <a href="#aura-composer" class="btn btn--ghost" style="margin-top:var(--space-md);">Ir al Aura Composer →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 27: ALARMA
+       Reloj + puzzle mandala para desactivar
+       ══════════════════════════════════════ -->
+  <section id="alarma" class="section alarma-section" aria-label="Alarma">
+    <div class="section__inner alarma-inner">
+      <p class="section-eyebrow">RITUAL DE INICIO</p>
+      <h2 class="section-title" style="font-size:var(--text-title);">despertar.</h2>
+
+      <!-- Display del reloj -->
+      <div class="alarma-clock-display">
+        <div class="alarma-time" id="alarma-time">07:00</div>
+        <div class="alarma-ampm">AM</div>
+      </div>
+
+      <!-- Ajustadores de hora -->
+      <div class="alarma-setters">
+        <div class="alarma-setter-col">
+          <button class="alarma-arrow" id="alarma-h-up">▲</button>
+          <span class="alarma-setter-val" id="alarma-h-val">07</span>
+          <button class="alarma-arrow" id="alarma-h-down">▼</button>
+        </div>
+        <div class="alarma-setter-sep">:</div>
+        <div class="alarma-setter-col">
+          <button class="alarma-arrow" id="alarma-m-up">▲</button>
+          <span class="alarma-setter-val" id="alarma-m-val">00</span>
+          <button class="alarma-arrow" id="alarma-m-down">▼</button>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--full" id="alarma-set" style="margin-top:var(--space-lg);">
+        Activar alarma ✦
+      </button>
+
+      <p class="alarma-status" id="alarma-status" style="display:none;">
+        Alarma activa · desactivar resolviendo el puzzle
+      </p>
+
+      <!-- Puzzle mandala para desactivar (oculto hasta que suena la alarma) -->
+      <div class="alarma-puzzle-wrap" id="alarma-puzzle" style="display:none;">
+        <p class="alarma-puzzle-label">Reorganizá los fragmentos para desactivar</p>
+        <div class="alarma-puzzle-grid" id="alarma-puzzle-grid">
+          <!-- 9 tiles generados por JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECCIÓN 15: FOOTER / CIERRE
+       ══════════════════════════════════════ -->
+  <footer id="footer" style="background:var(--bg-cream);padding:var(--space-3xl) var(--content-pad) calc(var(--tab-height) + var(--space-2xl));text-align:center;">
+    <div style="margin-bottom:var(--space-xl);">
+      <div style="width:48px;height:48px;border-radius:50%;background:radial-gradient(circle, var(--color-personal-1), var(--color-personal-2));margin:0 auto var(--space-md);opacity:0.7;"></div>
+      <p style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Apacheta</p>
+      <p style="font-size:var(--text-xs);color:var(--text-muted);letter-spacing:0.1em;">Tu biblia. Tu lenguaje. Tu frecuencia.</p>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:var(--space-xl);margin-bottom:var(--space-2xl);">
+      <a href="#dashboard" style="font-size:var(--text-small);color:var(--text-secondary);">Inicio</a>
+      <a href="#biblioteca" style="font-size:var(--text-small);color:var(--text-secondary);">Biblioteca</a>
+      <a href="#manifiestos" style="font-size:var(--text-small);color:var(--text-secondary);">Manifiestos</a>
+    </div>
+
+    <p style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-ghost);letter-spacing:0.08em;">
+      AJETREOS DEL SUR · CBA · 2026
+    </p>
+  </footer>
+
+  <!-- ══════════════════════════════════════
+       MODAL: Chakra detalle
+       ══════════════════════════════════════ -->
+  <div class="modal-overlay" id="chakra-overlay" aria-hidden="true"></div>
+  <div class="modal-sheet" id="chakra-modal" role="dialog" aria-modal="true">
+    <div class="modal-sheet__handle"></div>
+    <div style="padding:0 var(--content-pad) var(--space-2xl);">
+      <div id="chakra-modal-content"></div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- ════════════════════════════════════════
+     ENTRY POINT
+     ════════════════════════════════════════ -->
+<script type="module" src="/src/main.js"></script>
+
+</body>
+</html>

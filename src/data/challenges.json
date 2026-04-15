@@ -1,0 +1,51 @@
+[
+  {
+    "dia": 1,
+    "pregunta": "¿Qué hábito mental te limita más?",
+    "dato": "El 95% de tus decisiones diarias vienen de patrones inconscientes formados antes de los 7 años. (Bruce Lipton, Biology of Belief)",
+    "accion": "Escribí ese hábito. Nombralo. Lo que tiene nombre puede cambiarse.",
+    "categoria": "neuroplasticidad"
+  },
+  {
+    "dia": 2,
+    "pregunta": "¿Cuándo fue la última vez que hiciste algo por primera vez?",
+    "dato": "La novedad activa dopamina y genera nuevas conexiones neuronales. La rutina las consolida pero el crecimiento necesita fricción.",
+    "accion": "Planeá algo pequeño y nuevo para antes del domingo.",
+    "categoria": "creatividad"
+  },
+  {
+    "dia": 3,
+    "pregunta": "¿Qué aprendiste esta semana que no sabías el lunes?",
+    "dato": "El cerebro consolida aprendizajes durante el sueño profundo. Si no dormís bien, no aprendés bien. La siesta de 20 min reactiva la memoria.",
+    "accion": "Escribilo en una oración antes de que lo olvides.",
+    "categoria": "aprendizaje"
+  },
+  {
+    "dia": 4,
+    "pregunta": "¿A quién te acordaste sin razón aparente esta semana?",
+    "dato": "El cerebro no procesa recuerdos al azar. Las personas que emergen sin contexto suelen tener algo sin resolver emocionalmente.",
+    "accion": "Mandales un mensaje corto o escribí lo que querías decirles.",
+    "categoria": "emocional"
+  },
+  {
+    "dia": 5,
+    "pregunta": "¿Qué conexión inesperada encontraste entre dos cosas?",
+    "dato": "Steve Jobs: la creatividad es simplemente conectar cosas. Einstein llamaba a esto pensamiento asociativo combinatorio.",
+    "accion": "Describí esa conexión en una oración. Es el inicio de una idea original.",
+    "categoria": "creatividad"
+  },
+  {
+    "dia": 6,
+    "pregunta": "¿De qué te costó soltarte esta semana?",
+    "dato": "El apego al resultado destruye el proceso. Los estoicos distinguían entre lo que está en tu control y lo que no. La soltura es una práctica, no un estado.",
+    "accion": "Nombrá lo que querés soltar. Escribí por qué lo sostenés.",
+    "categoria": "filosofia"
+  },
+  {
+    "dia": 7,
+    "pregunta": "¿Qué creencia sobre vos mismo está lista para cambiar?",
+    "dato": "La neuroplasticidad confirma que el cerebro cambia físicamente con cada pensamiento repetido. No sos quien fuiste: sos quien estás siendo ahora.",
+    "accion": "Reescribí esa creencia en primera persona, en positivo, en presente.",
+    "categoria": "neuroplasticidad"
+  }
+]

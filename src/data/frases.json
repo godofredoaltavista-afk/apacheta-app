@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "texto": "La sabiduría es saber que soy nada. El amor es saber que soy todo. Y entre los dos, mi vida se mueve.",
+    "autor": "Nisargadatta Maharaj",
+    "obra": "I Am That",
+    "categoria": "espiritualidad",
+    "conexiones": ["budismo", "advaita vedanta", "física cuántica"]
+  },
+  {
+    "id": 2,
+    "texto": "Hacé del presente tu amigo, no tu enemigo. En este momento lo tenés todo.",
+    "autor": "Eckhart Tolle",
+    "obra": "El Poder del Ahora",
+    "categoria": "mindfulness",
+    "conexiones": ["buddhismo zen", "estoicismo", "neurociencia"]
+  },
+  {
+    "id": 3,
+    "texto": "Muy poco es necesario para una vida feliz; todo está dentro de vos mismo, en tu forma de pensar.",
+    "autor": "Marco Aurelio",
+    "obra": "Meditaciones",
+    "categoria": "filosofia",
+    "conexiones": ["estoicismo", "psicología cognitiva", "neuroplasticidad"]
+  },
+  {
+    "id": 4,
+    "texto": "No buscás lo que querés. Buscás lo que creés que merecés.",
+    "autor": "Jim Carrey",
+    "obra": "Commencement speech MIU",
+    "categoria": "psicologia",
+    "conexiones": ["autoestima", "ley de atracción", "psicología cognitiva"]
+  },
+  {
+    "id": 5,
+    "texto": "La restricción crea libertad. El jazz lo prueba cada noche.",
+    "autor": "Miles Davis",
+    "obra": "Kind of Blue sessions",
+    "categoria": "creatividad",
+    "conexiones": ["jazz modal", "taoísmo wu wei", "diseño"]
+  },
+  {
+    "id": 6,
+    "texto": "Lo que no puedes cambiar, dejalo fluir. Lo que podés cambiar, empezá ahora.",
+    "autor": "Epicteto",
+    "obra": "Enquiridión",
+    "categoria": "filosofia",
+    "conexiones": ["estoicismo", "terapia cognitivo-conductual", "zen"]
+  },
+  {
+    "id": 7,
+    "texto": "El lenguaje crea la realidad. No la describe: la invoca.",
+    "autor": "Ludwig Wittgenstein",
+    "obra": "Investigaciones Filosóficas",
+    "categoria": "filosofia",
+    "conexiones": ["lingüística", "física cuántica", "cognición"]
+  },
+  {
+    "id": 8,
+    "texto": "El universo no está hecho de materia. Está hecho de historias.",
+    "autor": "Muriel Rukeyser",
+    "obra": "The Speed of Darkness",
+    "categoria": "poesia",
+    "conexiones": ["narrativa", "física cuántica", "mitología"]
+  },
+  {
+    "id": 9,
+    "texto": "Toda comprensión es fundamentalmente una metáfora de algo más profundo que aún no comprendemos.",
+    "autor": "Douglas Hofstadter",
+    "obra": "Gödel, Escher, Bach",
+    "categoria": "ciencia",
+    "conexiones": ["recursividad", "consciencia", "arte"]
+  },
+  {
+    "id": 10,
+    "texto": "El silencio no es la ausencia de sonido. Es la presencia de lo que el sonido cubre.",
+    "autor": "John Cage",
+    "obra": "4'33\"",
+    "categoria": "arte",
+    "conexiones": ["zen budismo", "música experimental", "meditación"]
+  }
+]

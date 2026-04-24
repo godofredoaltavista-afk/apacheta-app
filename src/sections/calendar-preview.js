@@ -53,32 +53,47 @@ function renderNotas() {
 
   const colors = ['nota-card--amarilla', 'nota-card--cyan', 'nota-card--rosa', 'nota-card--lavanda'];
 
-  grid.innerHTML = keys.map((key, i) => {
-    const nota = notas[key];
-    const d    = new Date(key + 'T00:00:00');
+  grid.innerHTML = '';
+  keys.forEach((key, i) => {
+    const nota  = notas[key];
+    const d     = new Date(key + 'T00:00:00');
     const label = formatDate(d);
-    return `
-      <div class="nota-card ${colors[i % colors.length]}">
-        <p class="nota-card__date">${label}</p>
-        <p class="nota-card__text">${nota.texto?.slice(0, 80) || '...'}</p>
-      </div>
+    const card  = document.createElement('div');
+    card.className = `nota-card ${colors[i % colors.length]}`;
+    card.style.cursor = 'pointer';
+    card.innerHTML = `
+      <p class="nota-card__date">${label}</p>
+      <p class="nota-card__text">${nota.texto?.slice(0, 80) || '...'}</p>
     `;
-  }).join('');
+    card.addEventListener('click', () => {
+      const tag = nota.tags?.[0] || null;
+      window.dispatchEvent(new CustomEvent('manifiesto:openEditor', { detail: { nota, tag } }));
+      document.getElementById('manifiesto-gestor')?.scrollIntoView({ behavior: 'smooth' });
+    });
+    grid.appendChild(card);
+  });
 }
 
 function openDayNote(key, date) {
-  // Abre el modal de anotación con fecha
+  const user     = getUser();
+  const existing = user.notas?.[key];
+
+  if (existing) {
+    // Día con nota → ir al manifiesto gestor con esa nota
+    window.dispatchEvent(new CustomEvent('manifiesto:openEditor', { detail: { nota: existing } }));
+    document.getElementById('manifiesto-gestor')?.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+  // Día sin nota → abrir modal de anotación para crear
   const fab = document.getElementById('fab-anotacion');
   if (fab) fab.click();
 
   const title = document.querySelector('.anotacion-sheet__title');
   if (title) title.textContent = `${date.getDate()}/${date.getMonth() + 1} — Nota del día`;
 
-  // Pre-cargar nota existente si hay
-  const user = getUser();
-  const existing = user.notas?.[key];
   const textarea = document.getElementById('anotacion-text');
-  if (textarea && existing) textarea.value = existing.texto || '';
+  if (textarea) textarea.value = '';
 }
 
 function formatDate(d) {

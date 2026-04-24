@@ -1,36 +1,69 @@
 /* =============================================
-   APACHETA — ANOTACIÓN RÁPIDA
-   FAB + Modal Sheet + Post-it + localStorage
+   APACHETA — ANOTACIÓN RÁPIDA v2
+   FAB + Modal top-down + Título + Color + Lista
    ============================================= */
 
 import { getUser, saveUser } from '../main.js';
+import { openNoteReader } from '../core/nota-reader.js';
+import { NotasStore } from '../state/NotasStore.js';
+
+const NOTE_COLORS = ['#FFE44D', '#A8E6E0', '#F4C2C2', '#B8D4B0', '#D4C5E8', '#F5D89A'];
 
 export function initAnotacion() {
-  const fab      = document.getElementById('fab-anotacion');
-  const modal    = document.getElementById('anotacion-modal');
-  const overlay  = document.getElementById('modal-overlay');
-  const saveBtn  = document.getElementById('save-anotacion');
-  const manifBtn = document.getElementById('save-manifiesto');
-  const textarea = document.getElementById('anotacion-text');
-  const tagsEl   = document.getElementById('anotacion-tags');
-  const postitMini = document.getElementById('postit-mini');
-  const postitPreview = document.getElementById('postit-preview');
+  const fab         = document.getElementById('fab-anotacion');
+  const modal       = document.getElementById('anotacion-modal');
+  const overlay     = document.getElementById('modal-overlay');
+  const saveBtn     = document.getElementById('save-anotacion');
+  const manifBtn    = document.getElementById('save-manifiesto');
+  const textarea    = document.getElementById('anotacion-text');
+  const tagsEl      = document.getElementById('anotacion-tags');
+  const tituloInput = document.getElementById('anotacion-titulo');
+  const colorPicker = document.getElementById('anotacion-color-picker');
+  const notasStack  = document.getElementById('notas-stack');
+  const tabBtns     = document.querySelectorAll('.anotacion-tab');
+  const panelNueva  = document.getElementById('anotacion-panel-nueva');
+  const panelLista  = document.getElementById('anotacion-panel-lista');
 
   if (!fab || !modal) return;
 
+  // Render stack on load
+  renderStack();
+
   let selectedTags  = [];
+  let selectedColor = NOTE_COLORS[0];
   let isOpen        = false;
   let dragStartY    = 0;
+  let activeTab     = 'nueva';
 
-  // ─── Abrir ────────────────────────────────
-  fab.addEventListener('click', () => {
-    if (isOpen) {
-      closeSheet();
-    } else {
-      openSheet();
-    }
+  // ─── Tab switching ────────────────────────
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      tabBtns.forEach(b => b.classList.toggle('is-active', b.dataset.tab === activeTab));
+      panelNueva.style.display  = activeTab === 'nueva' ? '' : 'none';
+      panelLista.style.display  = activeTab === 'lista' ? '' : 'none';
+      if (activeTab === 'lista') renderLista();
+    });
   });
 
+  // ─── Color picker ─────────────────────────
+  function applyNoteColor(color) {
+    selectedColor = color;
+    if (textarea)    textarea.style.setProperty('--note-current-color', color + '55');
+    if (tituloInput) tituloInput.style.borderColor = color;
+    colorPicker?.querySelectorAll('.anotacion-color-dot').forEach(d =>
+      d.classList.toggle('is-selected', d.dataset.color === color)
+    );
+  }
+
+  colorPicker?.querySelectorAll('.anotacion-color-dot').forEach(dot => {
+    dot.addEventListener('click', () => applyNoteColor(dot.dataset.color));
+  });
+  // Seleccionar el primero por defecto
+  applyNoteColor(selectedColor);
+
+  // ─── Abrir / Cerrar ───────────────────────
+  fab.addEventListener('click', () => isOpen ? closeSheet() : openSheet());
   overlay?.addEventListener('click', closeSheet);
 
   function openSheet() {
@@ -39,9 +72,8 @@ export function initAnotacion() {
     modal.classList.add('open');
     overlay?.classList.add('open');
     document.body.style.overflow = 'hidden';
-    textarea?.focus();
+    if (activeTab === 'nueva') textarea?.focus();
 
-    // BUG 1.4: visualViewport — mover modal cuando sube el teclado en iOS
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', onViewportResize);
       window.visualViewport.addEventListener('scroll', onViewportResize);
@@ -52,46 +84,39 @@ export function initAnotacion() {
     isOpen = false;
     fab.classList.remove('open');
     modal.classList.remove('open');
-    modal.style.transform = ''; // resetear cualquier offset de teclado
+    modal.style.transform = '';
     overlay?.classList.remove('open');
     document.body.style.overflow = '';
 
-    // BUG 1.4: remover listeners de viewport
     if (window.visualViewport) {
       window.visualViewport.removeEventListener('resize', onViewportResize);
       window.visualViewport.removeEventListener('scroll', onViewportResize);
     }
   }
 
-  // BUG 1.4: reposicionar modal cuando el teclado virtual aparece
   function onViewportResize() {
     if (!isOpen) return;
     const vv = window.visualViewport;
-    // Cuánto sube el teclado: diferencia entre viewport visual y alto total
     const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
     if (keyboardOffset > 50) {
-      // Teclado abierto: subir el modal para que no quede tapado
       modal.style.transition = 'none';
-      modal.style.transform = `translateX(-50%) translateY(-${keyboardOffset}px)`;
+      modal.style.transform = `translateX(-50%) translateY(${keyboardOffset * 0.5}px)`;
     } else {
-      // Teclado cerrado: volver a posición original
       modal.style.transition = '';
       modal.style.transform = '';
     }
   }
 
-  // ─── Swipe to close ───────────────────────
-  // Solo trackear si el touch empieza cerca de la parte superior del modal (handle area)
+  // ─── Swipe up to close ────────────────────
   let swipeActive = false;
+  const handleEl = modal.querySelector('.modal-sheet__handle--bottom');
 
   modal.addEventListener('touchstart', e => {
-    const rect = modal.getBoundingClientRect();
+    const rect   = modal.getBoundingClientRect();
     const touchY = e.touches[0].clientY;
-    // Activar swipe solo si el touch es en el 25% superior del modal (zona handle)
-    if (touchY - rect.top < rect.height * 0.25) {
+    if (touchY - rect.top < rect.height * 0.18) {
       dragStartY  = touchY;
       swipeActive = true;
-      // Deshabilitar transición durante el drag para que siga el dedo
       modal.style.transition = 'none';
     }
   }, { passive: true });
@@ -99,9 +124,7 @@ export function initAnotacion() {
   modal.addEventListener('touchmove', e => {
     if (!swipeActive) return;
     const delta = e.touches[0].clientY - dragStartY;
-    if (delta > 0) {
-      // La modal en estado .open tiene transform: translateX(-50%) translateY(0)
-      // Al arrastrar, sumamos el delta vertical
+    if (delta < 0) {
       modal.style.transform = `translateX(-50%) translateY(${delta}px)`;
     }
   }, { passive: true });
@@ -109,17 +132,10 @@ export function initAnotacion() {
   modal.addEventListener('touchend', e => {
     if (!swipeActive) return;
     swipeActive = false;
-
     const delta = e.changedTouches[0].clientY - dragStartY;
-
-    // Restaurar transición CSS
     modal.style.transition = '';
     modal.style.transform  = '';
-
-    if (delta > 90) {
-      closeSheet();
-    }
-    // Si no supera el umbral, el modal vuelve solo a posición 0 por la transición CSS
+    if (delta < -90) closeSheet();
   });
 
   // ─── Tags ─────────────────────────────────
@@ -135,7 +151,6 @@ export function initAnotacion() {
     });
   });
 
-  // Auto-sugerir tags mientras tipea
   textarea?.addEventListener('input', () => {
     const val = (textarea.value || '').toLowerCase();
     const suggestions = {
@@ -146,88 +161,218 @@ export function initAnotacion() {
       musical:   ['música', 'canción', 'jazz', 'coltrane', 'miles', 'beatles', 'letra', 'ritmo'],
       yoga:      ['yoga', 'chakra', 'respirar', 'medita', 'asana', 'prana'],
     };
-
-    tagsEl?.querySelectorAll('.anotacion-tag').forEach(tag => {
+    tagsEl.querySelectorAll('.anotacion-tag').forEach(tag => {
       const t     = tag.dataset.tag;
       const words = suggestions[t] || [];
       const match = words.some(w => val.includes(w));
       if (match && !tag.classList.contains('active')) {
-        tag.style.background = 'rgba(168,230,224,0.3)';
+        tag.style.background  = 'rgba(168,230,224,0.3)';
         tag.style.borderColor = 'rgba(168,230,224,0.6)';
       } else if (!tag.classList.contains('active')) {
-        tag.style.background = '';
+        tag.style.background  = '';
         tag.style.borderColor = '';
       }
     });
   });
 
-  // ─── Guardar como post-it ─────────────────
+  // ─── Guardar nota ─────────────────────────
   saveBtn?.addEventListener('click', () => {
-    const texto = textarea?.value.trim();
+    const texto  = textarea?.value.trim();
     if (!texto) return;
 
-    const key  = new Date().toISOString().slice(0, 10);
-    const nota = { texto, tags: selectedTags, ts: Date.now() };
+    const titulo = tituloInput?.value.trim() || generarTituloAuto(texto);
+    const id     = Date.now().toString(36);
+    const nota   = {
+      id, titulo, texto,
+      color: selectedColor,
+      tags:  [...selectedTags],
+      ts:    Date.now(),
+    };
 
-    const user = getUser();
-    const notas = { ...(user.notas || {}), [key]: nota };
+    // Usar NotasStore: guarda local + sincroniza API en background
+    NotasStore.create(nota);
 
-    // Guardar última en ultimasAnotaciones
-    const ultimas = [texto, ...(user.ultimasAnotaciones || [])].slice(0, 3);
-    saveUser({ notas, ultimasAnotaciones: ultimas });
+    window.feedbackBus?.push({
+      type: 'note-written',
+      payload: { titulo, preview: texto.slice(0, 60), tags: [...selectedTags], color: selectedColor }
+    });
 
-    // Mostrar post-it
-    if (postitMini) {
-      postitMini.style.display = 'block';
-      if (postitPreview) postitPreview.textContent = texto;
-    }
-
-    // Limpiar + cerrar
-    if (textarea) textarea.value = '';
-    selectedTags = [];
-    tagsEl?.querySelectorAll('.anotacion-tag').forEach(t => t.classList.remove('active'));
+    renderStack();
+    resetForm();
     closeSheet();
-
-    // Feedback visual
-    showToast('Guardado como post-it ✓');
+    showToast(`"${titulo}" guardada ✓`);
   });
 
-  // ─── Guardar como manifiesto ──────────────
   manifBtn?.addEventListener('click', () => {
     const texto = textarea?.value.trim();
     if (!texto) return;
-    // Por ahora igual que post-it + scroll a manifiestos
     saveBtn?.click();
     setTimeout(() => {
-      document.getElementById('manifiestos')?.scrollIntoView({ behavior: 'smooth' });
+      const user = getUser();
+      const ultimaNota = (user.notasList || []).at(-1);
+      window.dispatchEvent(new CustomEvent('manifiesto:openEditor', { detail: { nota: ultimaNota } }));
+      document.getElementById('manifiesto-gestor')?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   });
 
-  // ─── Post-it click (expand) ───────────────
+  const postitMini = document.getElementById('postit-mini');
   postitMini?.addEventListener('click', () => {
-    const user   = getUser();
-    const key    = new Date().toISOString().slice(0, 10);
-    const nota   = user.notas?.[key];
-    if (nota && textarea) {
-      textarea.value = nota.texto || '';
+    const user  = getUser();
+    const lista = user.notasList || [];
+    if (lista.length && textarea) {
+      const last = lista[lista.length - 1];
+      textarea.value = last.texto || '';
+      if (tituloInput) tituloInput.value = last.titulo || '';
     }
     openSheet();
     postitMini.style.display = 'none';
   });
+
+  // ─── Renderizar lista de notas ─────────────
+  function renderLista() {
+    const grid  = document.getElementById('anotacion-lista-grid');
+    const empty = document.getElementById('anotacion-lista-empty');
+    if (!grid) return;
+
+    const user  = getUser();
+    const lista = [...(user.notasList || [])].reverse();
+
+    grid.innerHTML = '';
+
+    if (!lista.length) {
+      if (empty) empty.style.display = '';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    lista.forEach(nota => {
+      const card = document.createElement('div');
+      card.className = 'anotacion-saved-card';
+      card.style.background = (nota.color || '#FFE44D') + '88';
+      card.style.borderColor = nota.color || '#FFE44D';
+
+      const fecha = new Date(nota.ts).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+      card.innerHTML = `
+        <p class="anotacion-saved-titulo">${nota.titulo || 'Sin título'}</p>
+        <p class="anotacion-saved-texto">${nota.texto.slice(0, 90)}${nota.texto.length > 90 ? '…' : ''}</p>
+        <div class="anotacion-saved-meta">
+          <span>${fecha}</span>
+          ${nota.tags?.map(t => `<span class="anotacion-saved-tag">${t}</span>`).join('') || ''}
+          <button class="anotacion-saved-del" data-id="${nota.id}" title="Eliminar">×</button>
+        </div>
+      `;
+      card.addEventListener('click', e => {
+        if (e.target.closest('.anotacion-saved-del')) return;
+        closeSheet();
+        setTimeout(() => openNoteReader(nota), 280);
+      });
+      grid.appendChild(card);
+    });
+
+    grid.querySelectorAll('.anotacion-saved-del').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id   = btn.dataset.id;
+        const user = getUser();
+        const list = (user.notasList || []).filter(n => n.id !== id);
+        saveUser({ notasList: list });
+        renderLista();
+      });
+    });
+  }
+
+  // ─── Stack flotante de notas ───────────────
+  function renderStack() {
+    if (!notasStack) return;
+    const user  = getUser();
+    const lista = [...(user.notasList || [])].reverse().slice(0, 5); // máx 5 visibles
+
+    notasStack.innerHTML = '';
+    if (!lista.length) return;
+
+    lista.forEach((nota, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'nota-chip';
+      chip.style.background = nota.color || '#FFE44D';
+      chip.style.zIndex = String(10 - i);
+      chip.style.setProperty('--chip-i', String(i));
+      chip.innerHTML = `
+        <span class="nota-chip__dot" style="background:${nota.color || '#FFE44D'};filter:brightness(0.7);"></span>
+        <span class="nota-chip__titulo">${nota.titulo || 'nota'}</span>
+        <button class="nota-chip__edit" title="Editar">✎</button>
+      `;
+
+      // Click sobre el chip → abrir visor de lectura
+      chip.addEventListener('click', e => {
+        if (e.target.closest('.nota-chip__edit')) return;
+        openNoteReader(nota);
+      });
+
+      // Botón ✎ → modo editar
+      chip.querySelector('.nota-chip__edit')?.addEventListener('click', e => {
+        e.stopPropagation();
+        if (textarea)    textarea.value = nota.texto || '';
+        if (tituloInput) tituloInput.value = nota.titulo || '';
+        applyNoteColor(nota.color || NOTE_COLORS[0]);
+        openSheet();
+      });
+
+      notasStack.appendChild(chip);
+    });
+  }
+
+  function resetForm() {
+    if (textarea)    textarea.value = '';
+    if (tituloInput) tituloInput.value = '';
+    selectedTags = [];
+    tagsEl?.querySelectorAll('.anotacion-tag').forEach(t => {
+      t.classList.remove('active');
+      t.style.background = '';
+      t.style.borderColor = '';
+    });
+    applyNoteColor(NOTE_COLORS[0]);
+  }
+
+  // ─── Escucha eventos del reader ─────────────
+  document.addEventListener('nota-edit-request', e => {
+    const nota = e.detail;
+    if (!nota) return;
+    if (textarea)    textarea.value = nota.texto || '';
+    if (tituloInput) tituloInput.value = nota.titulo || '';
+    applyNoteColor(nota.color || NOTE_COLORS[0]);
+    // Ir a tab nueva
+    const tabNueva = document.querySelector('.anotacion-tab[data-tab="nueva"]');
+    tabNueva?.click();
+    openSheet();
+  });
+
+  document.addEventListener('nota-delete-request', e => {
+    const nota = e.detail;
+    if (!nota?.id) return;
+    const user = getUser();
+    const list = (user.notasList || []).filter(n => n.id !== nota.id);
+    saveUser({ notasList: list });
+    renderStack();
+    if (activeTab === 'lista') renderLista();
+  });
 }
 
-// ─── Toast util ───────────────────────────────
+function generarTituloAuto(texto) {
+  const words = texto.split(/\s+/).slice(0, 5).join(' ');
+  return words.length < texto.length ? words + '…' : words;
+}
+
 function showToast(msg) {
   const toast = document.createElement('div');
   toast.textContent = msg;
   toast.style.cssText = `
-    position:fixed; bottom:calc(var(--tab-height) + 20px);
+    position:fixed; top:calc(env(safe-area-inset-top,0px) + 16px);
     left:50%; transform:translateX(-50%);
     background:var(--text-primary); color:var(--bg-primary);
     padding:10px 20px; border-radius:20px;
     font-size:0.875rem; font-weight:500;
     z-index:9999; pointer-events:none;
-    animation:fadeUp 0.3s ease both;
+    animation:fadeDown 0.3s ease both;
     white-space:nowrap;
   `;
   document.body.appendChild(toast);

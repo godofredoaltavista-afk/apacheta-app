@@ -138,6 +138,11 @@ function setupScratchCard(num) {
     if (isRevealed) return;
     isRevealed = true;
 
+    window.feedbackBus?.push({
+      type: 'scratch-revealed',
+      payload: { titulo: data?.titulo || card.dataset.scratchId || 'scratch' }
+    });
+
     // 1. Agregar clase CSS (overlay div se hace opacity:0)
     card.classList.add('revealed');
 

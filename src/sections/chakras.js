@@ -3,6 +3,16 @@
    7 chakras con modal de detalle
    ============================================= */
 
+const CHAKRA_KEYS = [
+  'chakras.muladhara.desc',
+  'chakras.svadhisthana.desc',
+  'chakras.manipura.desc',
+  'chakras.anahata.desc',
+  'chakras.vishuddha.desc',
+  'chakras.ajna.desc',
+  'chakras.sahasrara.desc',
+];
+
 const CHAKRAS_DATA = [
   {
     nombre: 'Raíz', sanskrit: 'Muladhara', num: 1,
@@ -166,6 +176,11 @@ export function initChakras() {
       const chakra = CHAKRAS_DATA[idx];
       if (!chakra || !modalContent) return;
 
+      window.feedbackBus?.push({
+        type: 'chakra-tapped',
+        payload: { idx, nombre: chakra.nombre, sanskrit: chakra.sanskrit }
+      });
+
       // Color gradient background for modal
       const c = chakra.color;
       const headerBg = `linear-gradient(160deg, ${c}33, ${c}11, transparent)`;
@@ -175,7 +190,7 @@ export function initChakras() {
           <div style="margin-bottom:var(--space-md);display:flex;justify-content:center;">${CHAKRA_ICONS[idx]}</div>
           <p style="font-family:var(--font-mono);font-size:var(--text-xs);color:${c};letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px;font-weight:600;">${chakra.sanskrit}</p>
           <h3 style="font-family:var(--font-display);font-size:var(--text-title);font-weight:700;margin-bottom:var(--space-sm);color:var(--text-primary);">${chakra.nombre}</h3>
-          <p style="font-size:var(--text-small);color:var(--text-secondary);line-height:var(--leading-body);">${chakra.desc}</p>
+          <p style="font-size:var(--text-small);color:var(--text-secondary);line-height:var(--leading-body);" data-copy-key="${CHAKRA_KEYS[idx]}">${chakra.desc}</p>
           <div style="margin-top:var(--space-md);width:40px;height:3px;background:${c};border-radius:2px;margin-inline:auto;opacity:0.7;"></div>
         </div>
 

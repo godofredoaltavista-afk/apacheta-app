@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 // ─── Secciones existentes ─────────────────────
 import { initOnboarding }       from './sections/onboarding.js';
-import { initDashboard }        from './sections/dashboard-dia.js';
+import { initDashboard, initFraseWindow } from './sections/dashboard-dia.js';
 import { initBiblioteca }       from './sections/biblioteca.js';
 import { initRespiracion }      from './sections/respiracion.js';
 import { initChakras }          from './sections/chakras.js';
@@ -34,6 +34,24 @@ import { initAuraHistory }          from './sections/aura-history.js';
 import { initLofi }                 from './sections/lofi.js';
 import { initAlarmaClock }          from './sections/alarma-clock.js';
 import { initGyroscope, initNameBubble, initScrollInvites } from './sections/gyroscope.js';
+import { initColorHud } from './sections/color-hud.js';
+import { initTelemetryHud } from './sections/telemetry-hud.js';
+import { springTo } from './core/spring.js';
+
+// ─── HUD system merge ─────────────────────────
+import { initNavDrawer }    from './core/nav-drawer.js';
+import { initSectionTint }  from './core/section-tint.js';
+import { initTrailSpawn }   from './core/trail-spawn.js';
+import { hydrateIcons }     from './core/icons.js';
+import { initTweaksPanel }  from './core/tweaks-panel.js';
+import { feedbackBus }      from './core/feedback-bus.js';
+import { initFeedbackBusPanel } from './components/feedback-bus-panel.js';
+import { initCopyOracle }       from './core/copy-oracle.js';
+import { initOracleButtons }    from './components/oracle-modal.js';
+import { initManifiestoGestor }  from './sections/manifiesto-gestor.js';
+import { initVentana2Historial }  from './sections/ventana2-historial.js';
+import { initPresetsFromURL, initPresetsUI } from './core/config-presets.js';
+import { initMandalaArchive }     from './sections/mandala-archive.js';
 
 // ─── Estado global del usuario ────────────────
 export const USER_KEY = 'apacheta_user';
@@ -171,16 +189,38 @@ function initNavigation() {
     });
   }
 
-  // Collapse/expand nav
-  const nav       = document.getElementById('morning-nav');
+  // Collapse/expand nav — spring physics
+  const nav         = document.getElementById('morning-nav');
   const collapseBtn = document.getElementById('nav-collapse-btn');
-  let navCollapsed = false;
+  let navCollapsed  = false;
+  let colSpring     = null;
+
+  // Entrance: nav slides up from below with spring overshoot
+  if (nav) {
+    nav.style.transform = 'translateX(-50%) translateY(120%)';
+    nav.style.transition = 'none';
+    setTimeout(() => {
+      springTo({
+        from: 120, to: 0, stiffness: 0.10, damping: 0.72,
+        onUpdate: v => { nav.style.transform = `translateX(-50%) translateY(${v}%)`; },
+      });
+    }, 400);
+  }
 
   if (collapseBtn && nav) {
     collapseBtn.addEventListener('click', () => {
       navCollapsed = !navCollapsed;
       nav.classList.toggle('collapsed', navCollapsed);
       collapseBtn.textContent = navCollapsed ? '›' : '‹';
+
+      // Spring animate the collapse button rotation
+      const startAngle = navCollapsed ? 0 : 180;
+      const endAngle   = navCollapsed ? 180 : 0;
+      if (colSpring) colSpring.cancel();
+      colSpring = springTo({
+        from: startAngle, to: endAngle, stiffness: 0.14, damping: 0.78,
+        onUpdate: deg => { collapseBtn.style.transform = `rotate(${deg}deg)`; },
+      });
     });
   }
 }
@@ -605,6 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 11. Secciones existentes
   initOnboarding();
   initDashboard();
+  initFraseWindow();
   initBiblioteca();
   initRespiracion();
   initChakras();
@@ -636,7 +677,28 @@ document.addEventListener('DOMContentLoaded', () => {
   initNameBubble();
   initScrollInvites();
 
-  console.log('%cApacheta 🌱 ready · 6 nuevas secciones activas', 'font-family:serif;font-size:14px;color:#A8E6E0;');
+  // 14. Color HUD flotante
+  initColorHud();
+
+  // 15. Telemetry HUD
+  initTelemetryHud();
+
+  // 16. HUD system merge (drawer · tint · trail · icons)
+  try { initSectionTint(); } catch (e) { console.warn('[section-tint]', e); }
+  try { initNavDrawer();   } catch (e) { console.warn('[nav-drawer]', e); }
+  try { initTrailSpawn();  } catch (e) { console.warn('[trail-spawn]', e); }
+  try { hydrateIcons();    } catch (e) { console.warn('[icons]', e); }
+  try { initTweaksPanel(); } catch (e) { console.warn('[tweaks-panel]', e); }
+  try { initFeedbackBusPanel(); } catch (e) { console.warn('[feedback-bus-panel]', e); }
+  try { initCopyOracle();       } catch (e) { console.warn('[copy-oracle]', e); }
+  try { initOracleButtons();    } catch (e) { console.warn('[oracle-buttons]', e); }
+  try { initManifiestoGestor();  } catch (e) { console.warn('[manifiesto-gestor]', e); }
+  try { initVentana2Historial();  } catch (e) { console.warn('[ventana2-historial]', e); }
+  try { initPresetsFromURL();     } catch (e) { console.warn('[presets-url]', e); }
+  try { initPresetsUI();          } catch (e) { console.warn('[presets-ui]', e); }
+  try { initMandalaArchive();     } catch (e) { console.warn('[mandala-archive]', e); }
+
+  console.log('%cApacheta ready · HUD system merged · Feedback Bus + Oracle online', 'font-family:serif;font-size:14px;color:#A8E6E0;');
 });
 
 // getModoActual y getModoLabel ya están exportadas arriba con `export function`

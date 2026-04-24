@@ -17,6 +17,22 @@ export function initLissajous() {
   let freqA = 2, freqB = 1;
   let active = false;
 
+  function readAccent() {
+    const cs = getComputedStyle(document.documentElement);
+    return (cs.getPropertyValue('--color-personal-1').trim() || '#D4C5E8');
+  }
+  let accent = readAccent();
+  const rgb = (hex) => {
+    const h = hex.replace('#','');
+    const n = h.length === 3 ? h.split('').map(c=>c+c).join('') : h;
+    return [parseInt(n.slice(0,2),16), parseInt(n.slice(2,4),16), parseInt(n.slice(4,6),16)];
+  };
+  let [AR,AG,AB] = rgb(accent);
+  window.addEventListener('apacheta:colorsChanged', () => {
+    accent = readAccent();
+    [AR,AG,AB] = rgb(accent);
+  });
+
   function resize() {
     W = canvas.width  = canvas.offsetWidth  || 390;
     H = canvas.height = canvas.offsetHeight || 420;
@@ -27,7 +43,7 @@ export function initLissajous() {
   // ── Drawing ──────────────────────────────────
   function draw(timestamp) {
     raf = requestAnimationFrame(draw);
-    t += 0.008;
+    t += 0.004;
 
     ctx.clearRect(0, 0, W, H);
 
@@ -44,7 +60,7 @@ export function initLissajous() {
       const alpha   = (1 - s / segments) * 0.9;
 
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(212,197,232,${alpha})`;
+      ctx.strokeStyle = `rgba(${AR},${AG},${AB},${alpha})`;
       ctx.lineWidth   = 1.5 - s * 0.15;
 
       for (let i = 0; i <= POINTS; i++) {
@@ -61,8 +77,8 @@ export function initLissajous() {
     const px = cx + r * Math.sin(freqA * a0 + t + delta);
     const py = cy + r * Math.sin(freqB * a0 + t);
     const grd = ctx.createRadialGradient(px, py, 0, px, py, 10);
-    grd.addColorStop(0, 'rgba(212,197,232,0.9)');
-    grd.addColorStop(1, 'rgba(212,197,232,0)');
+    grd.addColorStop(0, `rgba(${AR},${AG},${AB},0.9)`);
+    grd.addColorStop(1, `rgba(${AR},${AG},${AB},0)`);
     ctx.fillStyle = grd;
     ctx.beginPath();
     ctx.arc(px, py, 10, 0, Math.PI * 2);

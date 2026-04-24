@@ -14,15 +14,45 @@ export function initMandala() {
   const ctx = canvas.getContext('2d');
   let W, H, CX, CY;
   let isDrawing    = false;
-  let symmetry     = 8;    // ejes de simetría
+  let symmetry     = 8;
   let baseRotation = 0;
   let t            = 0;
-  const strokes    = [];   // historial para redraw
+  const strokes    = [];
   let lastX = 0, lastY = 0;
 
   const user   = getUserFromStorage();
-  const colors = user.colores || ['#A8E6E0', '#F4C2C2', '#D4C5E8'];
+  const colors = [...(user.colores || ['#A8E6E0', '#F4C2C2', '#D4C5E8'])];
   let colorIdx = 0;
+
+  // ─── Color picker buttons ─────────────────────
+  const colorBtns = document.querySelectorAll('.mandala-color-btn');
+  function syncColorBtns() {
+    colorBtns.forEach((btn, i) => {
+      btn.style.background = colors[i] || '#ccc';
+      btn.classList.toggle('is-active', i === colorIdx);
+    });
+  }
+  colorBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      colorIdx = parseInt(btn.dataset.colorIdx, 10);
+      syncColorBtns();
+    });
+  });
+  syncColorBtns();
+
+  // Update colors when user changes aura
+  window.addEventListener('apacheta:colorsChanged', e => {
+    const newCols = e.detail?.colores;
+    if (newCols) { newCols.forEach((c, i) => { colors[i] = c; }); syncColorBtns(); }
+  });
+
+  // ─── Symmetry selector ───────────────────────
+  document.querySelectorAll('.mandala-sym-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      symmetry = parseInt(btn.dataset.sym, 10);
+      document.querySelectorAll('.mandala-sym-btn').forEach(b => b.classList.toggle('is-active', b === btn));
+    });
+  });
 
   function resize() {
     W  = canvas.width  = canvas.offsetWidth  || 360;
@@ -135,10 +165,85 @@ export function initMandala() {
   });
 
   saveBtn?.addEventListener('click', () => {
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // Download full-size PNG
     const link = document.createElement('a');
     link.download = 'apacheta-mandala.png';
-    link.href     = canvas.toDataURL('image/png');
+    link.href     = dataUrl;
     link.click();
+
+    // Apply grayscale + build 50% thumbnail for archive
+    const grayCanvas = document.createElement('canvas');
+    grayCanvas.width  = W;
+    grayCanvas.height = H;
+    const gctx = grayCanvas.getContext('2d');
+    const img  = new Image();
+    img.onload = () => {
+      // full-size grayscale
+      gctx.drawImage(img, 0, 0);
+      const imgData = gctx.getImageData(0, 0, W, H);
+      for (let pi = 0; pi < imgData.data.length; pi += 4) {
+        const g = imgData.data[pi] * 0.299 + imgData.data[pi+1] * 0.587 + imgData.data[pi+2] * 0.114;
+        imgData.data[pi] = imgData.data[pi+1] = imgData.data[pi+2] = g;
+      }
+      gctx.putImageData(imgData, 0, 0);
+      const grayDataUrl = grayCanvas.toDataURL();
+
+      // 50% thumbnail (gray)
+      const thumbW = Math.round(W * 0.5);
+      const thumbH = Math.round(H * 0.5);
+      const thumbCanvas = document.createElement('canvas');
+      thumbCanvas.width  = thumbW;
+      thumbCanvas.height = thumbH;
+      thumbCanvas.getContext('2d').drawImage(grayCanvas, 0, 0, thumbW, thumbH);
+      const thumbUrl = thumbCanvas.toDataURL('image/jpeg', 0.75);
+
+      // Set section background
+      section.style.backgroundImage = `url(${grayDataUrl})`;
+      section.style.backgroundSize  = 'cover';
+      section.style.backgroundPos   = 'center';
+
+      // Save to archive
+      try {
+        const user    = JSON.parse(localStorage.getItem('apacheta_user') || '{}');
+        const today   = new Date().toISOString().split('T')[0];
+        const archive = user.mandalaArchive || [];
+        archive.unshift({ ts: Date.now(), fecha: today, thumbUrl, colores: user.colores || [], strokes: strokes.length });
+        if (archive.length > 30) archive.splice(30);
+        user.mandalaArchive  = archive;
+        // keep legacy mandalaHistory too
+        user.mandalaHistory  = user.mandalaHistory || [];
+        const legacyEntry    = { fecha: today, dataUrl, colores: user.colores || [] };
+        const legacyIdx      = user.mandalaHistory.findIndex(m => m.fecha === today);
+        if (legacyIdx >= 0) user.mandalaHistory[legacyIdx] = legacyEntry;
+        else user.mandalaHistory.push(legacyEntry);
+        if (user.mandalaHistory.length > 14) user.mandalaHistory.splice(0, user.mandalaHistory.length - 14);
+        localStorage.setItem('apacheta_user', JSON.stringify(user));
+
+        // Refresh archive gallery if visible
+        window.dispatchEvent(new CustomEvent('apacheta:mandalaArchiveUpdated', { detail: { thumbUrl, fecha: today } }));
+      } catch(e) { console.warn('[mandala-archive]', e); }
+
+      // Dispatch event
+      window.dispatchEvent(new CustomEvent('apacheta:mandalaSaved', {
+        detail: { dataUrl, grayDataUrl }
+      }));
+
+      // Feedback bus
+      const user = getUserFromStorage();
+      window.feedbackBus?.push({
+        type: 'mandala-saved',
+        payload: { strokes: strokes.length, symmetry, colores: user.colores || [] }
+      });
+    };
+    img.src = dataUrl;
+
+    // Visual feedback
+    if (saveBtn) {
+      saveBtn.textContent = '✦ Mandala guardado';
+      setTimeout(() => { saveBtn.textContent = 'Guardar mandala'; }, 2000);
+    }
   });
 }
 

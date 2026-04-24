@@ -4,6 +4,7 @@
    ============================================= */
 
 import { saveUser, applyUserColors, revealApp } from '../main.js';
+import { UserStore } from '../state/UserStore.js';
 
 export function initOnboarding() {
   const section   = document.getElementById('onboarding');
@@ -77,13 +78,16 @@ export function initOnboarding() {
         ? [...selectedColors, ...['#A8E6E0', '#F4C2C2', '#FFE44D']].slice(0, 3)
         : ['#A8E6E0', '#F4C2C2', '#FFE44D'];
 
-      saveUser({
+      const userData = {
         nombre,
         signo:               signoInput?.value.trim() || '',
         nacimiento:          fechaInput?.value || '',
         colores,
         onboardingCompleto:  true,
-      });
+      };
+
+      saveUser(userData);
+      UserStore.create(userData).catch(() => {});
 
       // Animación de salida del onboarding
       section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';

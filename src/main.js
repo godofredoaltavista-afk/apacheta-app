@@ -52,6 +52,7 @@ import { initManifiestoGestor }  from './sections/manifiesto-gestor.js';
 import { initVentana2Historial }  from './sections/ventana2-historial.js';
 import { initPresetsFromURL, initPresetsUI } from './core/config-presets.js';
 import { initMandalaArchive }     from './sections/mandala-archive.js';
+import { UserStore }              from './state/UserStore.js';
 
 // ─── Estado global del usuario ────────────────
 export const USER_KEY = 'apacheta_user';
@@ -606,6 +607,9 @@ export function revealApp() {
 document.addEventListener('DOMContentLoaded', () => {
   const user = getUser();
   applyUserColors(user.colores);
+
+  // Sync con API en background (no bloquea el boot)
+  UserStore.load().catch(() => {});
 
   // 1. Reveal animations
   initReveal();

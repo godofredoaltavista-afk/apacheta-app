@@ -696,6 +696,16 @@ document.addEventListener('DOMContentLoaded', () => {
   try { hydrateIcons();    } catch (e) { console.warn('[icons]', e); }
   try { initTweaksPanel(); } catch (e) { console.warn('[tweaks-panel]', e); }
   try { initFeedbackBusPanel(); } catch (e) { console.warn('[feedback-bus-panel]', e); }
+
+  // Dev toggle — muestra/oculta Edit Viewer + Feedback Bus
+  const devToggle = document.getElementById('dev-toggle');
+  if (devToggle) {
+    devToggle.addEventListener('click', () => {
+      const isOpen = document.body.classList.toggle('dev-mode');
+      devToggle.classList.toggle('is-open', isOpen);
+      devToggle.textContent = isOpen ? '‹' : '›';
+    });
+  }
   try { initCopyOracle();       } catch (e) { console.warn('[copy-oracle]', e); }
   try { initOracleButtons();    } catch (e) { console.warn('[oracle-buttons]', e); }
   try { initManifiestoGestor();  } catch (e) { console.warn('[manifiesto-gestor]', e); }

@@ -34,6 +34,7 @@ export function initAnotacion() {
   let isOpen        = false;
   let dragStartY    = 0;
   let activeTab     = 'nueva';
+  let editingId     = null;
 
   // ─── Tab switching ────────────────────────
   tabBtns.forEach(btn => {
@@ -181,16 +182,19 @@ export function initAnotacion() {
     if (!texto) return;
 
     const titulo = tituloInput?.value.trim() || generarTituloAuto(texto);
-    const id     = Date.now().toString(36);
-    const nota   = {
-      id, titulo, texto,
-      color: selectedColor,
-      tags:  [...selectedTags],
-      ts:    Date.now(),
-    };
 
-    // Usar NotasStore: guarda local + sincroniza API en background
-    NotasStore.create(nota);
+    if (editingId) {
+      NotasStore.update(editingId, { titulo, texto, color: selectedColor, tags: [...selectedTags] });
+    } else {
+      const nota = {
+        id:    Date.now().toString(36),
+        titulo, texto,
+        color: selectedColor,
+        tags:  [...selectedTags],
+        ts:    Date.now(),
+      };
+      NotasStore.create(nota);
+    }
 
     window.feedbackBus?.push({
       type: 'note-written',
@@ -311,6 +315,7 @@ export function initAnotacion() {
       // Botón ✎ → modo editar
       chip.querySelector('.nota-chip__edit')?.addEventListener('click', e => {
         e.stopPropagation();
+        editingId = nota.id;
         if (textarea)    textarea.value = nota.texto || '';
         if (tituloInput) tituloInput.value = nota.titulo || '';
         applyNoteColor(nota.color || NOTE_COLORS[0]);
@@ -322,6 +327,7 @@ export function initAnotacion() {
   }
 
   function resetForm() {
+    editingId = null;
     if (textarea)    textarea.value = '';
     if (tituloInput) tituloInput.value = '';
     selectedTags = [];
@@ -337,10 +343,10 @@ export function initAnotacion() {
   document.addEventListener('nota-edit-request', e => {
     const nota = e.detail;
     if (!nota) return;
+    editingId = nota.id;
     if (textarea)    textarea.value = nota.texto || '';
     if (tituloInput) tituloInput.value = nota.titulo || '';
     applyNoteColor(nota.color || NOTE_COLORS[0]);
-    // Ir a tab nueva
     const tabNueva = document.querySelector('.anotacion-tab[data-tab="nueva"]');
     tabNueva?.click();
     openSheet();

@@ -40,6 +40,7 @@ import { springTo } from './core/spring.js';
 
 // ─── HUD system merge ─────────────────────────
 import { initNavDrawer }    from './core/nav-drawer.js';
+import { initIosDock }      from './core/ios-dock.js';
 import { initSectionTint }  from './core/section-tint.js';
 import { initTrailSpawn }   from './core/trail-spawn.js';
 import { hydrateIcons }     from './core/icons.js';
@@ -690,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 16. HUD system merge (drawer · tint · trail · icons)
   try { initSectionTint(); } catch (e) { console.warn('[section-tint]', e); }
   try { initNavDrawer();   } catch (e) { console.warn('[nav-drawer]', e); }
+  try { initIosDock();     } catch (e) { console.warn('[ios-dock]', e); }
   try { initTrailSpawn();  } catch (e) { console.warn('[trail-spawn]', e); }
   try { hydrateIcons();    } catch (e) { console.warn('[icons]', e); }
   try { initTweaksPanel(); } catch (e) { console.warn('[tweaks-panel]', e); }

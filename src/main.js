@@ -19,6 +19,9 @@ import { initCalendar }         from './sections/calendar-preview.js';
 import { initConexiones }       from './sections/conexiones-culturales.js';
 import { initAnotacion }        from './sections/anotacion-rapida.js';
 
+// ─── Carta Astral panel ───────────────────────
+import { initCartaAstral } from './sections/carta-astral.js';
+
 // ─── Nuevas secciones ─────────────────────────
 import { initMente }                from './sections/mente.js';
 import { initSoplar }               from './sections/soplar.js';
@@ -713,6 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { initPresetsFromURL();     } catch (e) { console.warn('[presets-url]', e); }
   try { initPresetsUI();          } catch (e) { console.warn('[presets-ui]', e); }
   try { initMandalaArchive();     } catch (e) { console.warn('[mandala-archive]', e); }
+  try { initCartaAstral();        } catch (e) { console.warn('[carta-astral]', e); }
 
   console.log('%cApacheta ready · HUD system merged · Feedback Bus + Oracle online', 'font-family:serif;font-size:14px;color:#A8E6E0;');
 });

@@ -72,6 +72,12 @@ const NAV_GROUPS = [
       { id: 'banner-gallery',   label: 'Galería',         icon: 'mandala' },
     ]
   },
+  {
+    id: 'sideral-grp', label: 'Sideral', icon: 'astral',
+    items: [
+      { id: 'carta-astral', label: 'Carta Astral', icon: 'astral', action: 'open-astral' },
+    ]
+  },
 ];
 
 // Flat list for IntersectionObserver telemetry (backward compat)
@@ -153,7 +159,10 @@ export function initNavDrawer() {
             </button>
             <div class="drawer__subitems" id="drawer-sub-${grp.id}">
               ${grp.items.map((it, i) => `
-                <a href="#${it.id}" class="drawer__item drawer__subitem" data-section="${it.id}" style="--i:${i}">
+                <a href="#${it.id}" class="drawer__item drawer__subitem"
+                  data-section="${it.id}"
+                  ${it.action ? `data-action="${it.action}"` : ''}
+                  style="--i:${i}">
                   <span class="drawer__item-ico">${ICONS[it.icon] || ICONS.home}</span>
                   <span class="drawer__item-lbl">${it.label}</span>
                 </a>
@@ -236,6 +245,12 @@ export function initNavDrawer() {
   drawer.querySelectorAll('.drawer__item').forEach(a => {
     a.addEventListener('click', (e) => {
       e.preventDefault();
+      // Panel especial: abrir sin scroll
+      if (a.dataset.action === 'open-astral') {
+        closeDrawer();
+        setTimeout(() => window.openCartaAstral?.(), 260);
+        return;
+      }
       const id = a.dataset.section;
       const target = document.getElementById(id);
       if (target) {

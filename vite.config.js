@@ -7,9 +7,35 @@ export default defineConfig({
     host: true,
     open: true,
     proxy: {
-      '/api': {
-        target: 'https://apacheta-nine.vercel.app',
-        changeOrigin: true
+      // Geocodificación → Nominatim (OpenStreetMap)
+      '/api/geocode': {
+        target: 'https://nominatim.openstreetmap.org',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const url = new URL(req.url, 'http://localhost')
+            const params = new URLSearchParams(url.search)
+            params.set('format', 'json')
+            params.set('addressdetails', '1')
+            proxyReq.path = '/search?' + params.toString()
+            proxyReq.setHeader('User-Agent', 'Apacheta/1.0 (francoaltavista@gmail.com)')
+            proxyReq.setHeader('Accept-Language', 'es')
+            proxyReq.setHeader('Accept', 'application/json')
+          })
+        }
+      },
+      // Efemérides Swiss → astro.com/cgi/swetest.cgi
+      '/api/chart': {
+        target: 'https://www.astro.com',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const url = new URL(req.url, 'http://localhost')
+            proxyReq.path = '/cgi/swetest.cgi' + url.search
+            proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (compatible; Apacheta/1.0; francoaltavista@gmail.com)')
+            proxyReq.setHeader('Accept', 'text/plain, */*')
+          })
+        }
       }
     }
   },

@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
   // ─── PATCH — actualizar campos ─────────────
   if (req.method === 'PATCH') {
-    const allowed = ['nombre', 'signo', 'nacimiento', 'colores', 'alucinajeActivo'];
+    const allowed = ['nombre', 'signo', 'nacimiento', 'colores', 'alucinajeActivo', 'cartaAstral', 'numerologia'];
     const patch   = Object.fromEntries(
       Object.entries(req.body || {}).filter(([k]) => allowed.includes(k))
     );

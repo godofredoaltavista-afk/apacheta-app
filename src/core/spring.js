@@ -7,13 +7,13 @@
 export function springTo(opts) {
   const {
     from       = 0,
-    to         = 1,
     stiffness  = 0.12,
     damping    = 0.75,
     onUpdate,
     onDone,
     precision  = 0.001,
   } = opts;
+  let to = opts.to !== undefined ? opts.to : 1;
 
   let current  = from;
   let velocity = 0;

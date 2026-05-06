@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="/styles/folders.css" />
   <link rel="stylesheet" href="/styles/manifiesto-gestor.css" />
   <link rel="stylesheet" href="/styles/ios-dock.css" />
+  <link rel="stylesheet" href="/styles/carta-astral.css" />
 
   <!-- Theme init (antes de pintar) -->
   <script>
@@ -2056,6 +2057,138 @@
     </div>
     <div class="modal-sheet__handle modal-sheet__handle--bottom"></div>
   </div>
+
+  <!-- ══════════════════════════════════════
+       FAB — Carta Astral
+       Fixed bottom-right, encima del v2-trigger
+       ══════════════════════════════════════ -->
+  <button class="ca-fab" id="ca-fab" aria-label="Carta Astral" title="Tu carta sideral">CARTA ASTRAL</button>
+
+  <!-- ══════════════════════════════════════
+       CARTA ASTRAL — Panel full-screen derecho
+       ══════════════════════════════════════ -->
+  <div id="ca-panel" class="ca-panel" role="dialog" aria-modal="true" aria-label="Carta Astral">
+
+    <div class="ca-panel__header">
+      <div class="ca-panel__title-wrap">
+        <div class="ca-panel__user-dot" id="ca-user-dot">?</div>
+        <span class="ca-panel__title">// CARTA ASTRAL</span>
+      </div>
+      <button id="ca-panel-close" class="ca-panel__close" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="ca-tabs" role="tablist">
+      <button class="ca-tab is-active" data-tab="carta" role="tab">CARTA</button>
+      <button class="ca-tab" data-tab="numeros" role="tab">NÚMEROS</button>
+      <button class="ca-tab" data-tab="tarot" role="tab">TAROT</button>
+    </div>
+
+    <div class="ca-panel__body">
+
+      <!-- ── CARTA screen ───────────────────── -->
+      <div id="ca-screen-carta" class="ca-screen is-active">
+
+        <!-- Form de ingreso -->
+        <div id="ca-form-block" class="ca-form-block">
+
+          <div class="ca-form-hero">
+            <h2 class="ca-form-hero__title">Tu mapa<br><span class="ca-form-hero__accent">sideral</span></h2>
+            <p class="ca-form-hero__sub">El cielo exacto del momento en que llegaste al mundo.</p>
+          </div>
+
+          <div class="ca-field-group">
+            <label class="ca-label" for="ca-nombre">Nombre</label>
+            <input class="ca-input" id="ca-nombre" type="text" placeholder="Tu nombre" autocomplete="name" />
+          </div>
+
+          <div class="ca-field-group ca-field-group--autocomplete">
+            <label class="ca-label" for="ca-ciudad">Ciudad de nacimiento</label>
+            <input class="ca-input" id="ca-ciudad" type="text"
+              placeholder="Ej: Córdoba, Argentina" autocomplete="off" />
+            <ul class="ca-dropdown" id="ca-ciudad-list" hidden></ul>
+          </div>
+
+          <div class="ca-form-row">
+            <div class="ca-field-group">
+              <label class="ca-label" for="ca-fecha">Fecha de nacimiento</label>
+              <input class="ca-input" id="ca-fecha" type="date" />
+            </div>
+            <div class="ca-field-group">
+              <label class="ca-label" for="ca-hora">
+                Hora local
+                <span class="ca-label-hint">define el Ascendente</span>
+              </label>
+              <input class="ca-input" id="ca-hora" type="time" placeholder="00:00" />
+            </div>
+          </div>
+
+          <p class="ca-error-msg" id="ca-error-msg" hidden></p>
+
+          <button class="ca-btn ca-btn--primary" id="ca-btn-calcular">Calcular carta ✦</button>
+          <p class="ca-loading" id="ca-loading" hidden>Consultando los cielos…</p>
+        </div>
+
+        <!-- Resultados (oculto hasta calcular) -->
+        <div id="ca-results-block" class="ca-results-block" hidden>
+
+          <!-- Big 3: Sol · Luna · ASC -->
+          <div class="ca-big3">
+            <div class="ca-big3-item">
+              <span class="ca-big3-label">SOL</span>
+              <span class="ca-big3-val" id="ca-sol-val">—</span>
+            </div>
+            <div class="ca-big3-item">
+              <span class="ca-big3-label">LUNA</span>
+              <span class="ca-big3-val" id="ca-luna-val">—</span>
+            </div>
+            <div class="ca-big3-item">
+              <span class="ca-big3-label">ASC</span>
+              <span class="ca-big3-val" id="ca-asc-val">—</span>
+            </div>
+          </div>
+
+          <!-- Intro: texto Sol en signo -->
+          <div id="ca-intro-wrap" class="ca-intro-wrap"></div>
+
+          <!-- Toggle vista: Rueda / Inmersivo -->
+          <div class="ca-mode-toggle">
+            <button class="ca-mode-btn is-active" id="ca-modo-mapa">◎ CARTA</button>
+            <button class="ca-mode-btn" id="ca-modo-inm">✦ INMERSIVO</button>
+          </div>
+
+          <!-- Vista rueda zodiacal -->
+          <div id="ca-mapa-view">
+            <canvas class="ca-wheel" id="ca-wheel"></canvas>
+            <div class="ca-wheel-legend" id="ca-wheel-legend"></div>
+            <div id="ca-planetas-list" class="ca-planetas-list"></div>
+            <div id="ca-elementos" class="ca-elementos"></div>
+            <div class="ca-result-actions">
+              <button class="ca-btn ca-btn--secondary" id="ca-btn-editar">← Editar</button>
+              <button class="ca-btn ca-btn--ghost" id="ca-export-pdf">Guardar carta ↓</button>
+            </div>
+          </div>
+
+          <!-- Vista inmersiva Three.js -->
+          <div id="ca-inm-view" hidden>
+            <canvas class="ca-inm-canvas" id="ca-inm-canvas"></canvas>
+            <div class="ca-inm-info" id="ca-inm-info"></div>
+          </div>
+
+        </div>
+      </div><!-- /#ca-screen-carta -->
+
+      <!-- ── NÚMEROS screen ─────────────────── -->
+      <div id="ca-screen-numeros" class="ca-screen">
+        <!-- populated by renderNumerologia() -->
+      </div>
+
+      <!-- ── TAROT screen ───────────────────── -->
+      <div id="ca-screen-tarot" class="ca-screen">
+        <!-- populated by renderTarot() -->
+      </div>
+
+    </div><!-- /.ca-panel__body -->
+  </div><!-- /#ca-panel -->
 
 </div><!-- /#app -->
 

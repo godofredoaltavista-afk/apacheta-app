@@ -84,6 +84,9 @@ export const ICONS = {
   breath_flow: wrap(`<path d="M3 8c3-3 6-3 9 0s6 3 9 0"/><path d="M3 12c3-3 6-3 9 0s6 3 9 0"/><path d="M3 16c3-3 6-3 9 0s6 3 9 0"/>`),
   star: wrap(`<path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5-6-3.5-6 3.5 1.5-6.5-5-4.5 6.5-.5z"/>`),
   compass: wrap(`<circle cx="12" cy="12" r="9"/><path d="M14 10l-5 5M14 10l-2 4-2 1 1-2z" fill="currentColor"/>`),
+
+  // ─── Astral / sideral ─────────────────────
+  astral: wrap(`<circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="8.5" opacity="0.35" stroke-dasharray="1.5 2.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>`),
 };
 
 /* ─── Helpers para inyectar ─── */

@@ -14,6 +14,8 @@ const userSchema = new mongoose.Schema({
   colores:            { type: [String], default: ['#A8E6E0', '#F4C2C2', '#FFE44D'] },
   alucinajeActivo:    { type: Boolean, default: false },
   onboardingCompleto: { type: Boolean, default: false },
+  cartaAstral:        { type: mongoose.Schema.Types.Mixed, default: null },
+  numerologia:        { type: mongoose.Schema.Types.Mixed, default: null },
 }, { timestamps: true });
 
 // ─── NOTA ─────────────────────────────────────

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "astronomy-engine": "^2.1.19",
     "mongoose": "^9.5.0",
     "three": "^0.160.0"
   },

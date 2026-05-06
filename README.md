@@ -232,7 +232,18 @@ GET  /api/user            → Perfil de usuario
 POST /api/app-schema      → Schema completo para contexto del Oracle
 ```
 
-## Run local
+## Demo
+
+<table>
+<tr>
+<td width="50%"><img src="docs/demo-1.gif" width="100%"/></td>
+<td width="50%"><img src="docs/demo-2.gif" width="100%"/></td>
+</tr>
+</table>
+
+<img src="docs/demo-3.gif" width="100%"/>
+
+## Dev
 
 ```bash
 npm install
@@ -241,7 +252,6 @@ npm run build  # → dist/
 ```
 
 ```
-# Variables de entorno opcionales:
 NOTEBOOKLM_NOTEBOOK_ID=tu_notebook_id
 MONGODB_URI=tu_connection_string
 ```

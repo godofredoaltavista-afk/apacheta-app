@@ -344,21 +344,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 10px 12px;
-  border-top: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 2px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  margin-top: 6px;
 }
 .ca-legend-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.64rem;
-  color: rgba(200,200,230,0.5);
+  gap: 5px;
+  font-size: 0.65rem;
+  color: var(--text-secondary, #555);
   font-family: var(--font-mono, monospace);
+  font-weight: 500;
 }
 .ca-legend-dot {
-  width: 6px; height: 6px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 0 4px currentColor;
 }
 
 /* Inmersivo */
@@ -435,69 +438,90 @@
 }
 
 .ca-planeta-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: box-shadow 0.18s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-.ca-planeta-card:hover { background: rgba(255,255,255,0.06); }
+.ca-planeta-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+  transform: translateY(-1px);
+}
 
 .ca-planeta-card__hd {
   display: grid;
-  grid-template-columns: 28px 1fr auto 16px;
+  grid-template-columns: 28px 1fr auto 20px;
   align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 14px 16px;
 }
 
-.ca-planeta-card__glifo { font-size: 1.1rem; text-align: center; }
-.ca-planeta-card__name  { font-weight: 600; font-size: 0.82rem; color: #E8E4F0; }
-.ca-planeta-card__pos   {
+.ca-planeta-card__glifo {
+  font-size: 1.25rem;
+  text-align: center;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.ca-planeta-card__name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1A1A1A);
+  letter-spacing: 0.01em;
+}
+.ca-planeta-card__pos {
   font-family: var(--font-mono, monospace);
-  font-size: 0.6rem;
-  color: rgba(200,200,230,0.45);
+  font-size: 0.62rem;
+  color: var(--text-secondary, #666);
   text-align: right;
-  line-height: 1.3;
+  line-height: 1.4;
+  font-weight: 500;
 }
 .ca-planeta-card__arrow {
-  font-size: 0.9rem;
-  color: rgba(200,200,230,0.3);
+  font-size: 1rem;
+  color: var(--text-muted, #bbb);
   transition: transform 0.22s;
+  font-weight: 300;
 }
 .ca-planeta-card.is-open .ca-planeta-card__arrow { transform: rotate(90deg); }
 
 .ca-planeta-card__body {
   overflow: hidden;
   max-height: 0;
-  transition: max-height 0.32s ease;
-  padding: 0 14px;
+  transition: max-height 0.35s ease;
+  padding: 0 16px;
 }
 .ca-planeta-card.is-open .ca-planeta-card__body {
-  max-height: 600px;
-  padding-bottom: 14px;
+  max-height: 700px;
+  padding-bottom: 16px;
 }
 
 .ca-planeta-card__texto {
-  font-size: 0.8rem;
-  line-height: 1.7;
-  color: rgba(200,200,230,0.7);
-  margin: 0 0 10px;
+  font-size: 0.83rem;
+  line-height: 1.75;
+  color: var(--text-secondary, #444);
+  margin: 0 0 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding-top: 12px;
 }
 
 .ca-planeta-card__casa {
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   line-height: 1.65;
-  color: rgba(200,200,230,0.55);
-  border-top: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-muted, #777);
+  border-top: 1px solid rgba(0,0,0,0.05);
   padding-top: 10px;
   margin: 0;
+  background: rgba(0,0,0,0.02);
+  border-radius: 0 0 8px 8px;
+  padding: 10px 12px;
+  margin: 0 -16px;
 }
 .ca-planeta-card__casa em {
   font-style: normal;
-  font-weight: 600;
-  color: #9060FF;
+  font-weight: 700;
+  color: var(--color-accent, #7040E0);
 }
 
 /* Elementos */
@@ -576,15 +600,28 @@
 /* Intro quote */
 .ca-intro-quote {
   margin-bottom: 20px;
-  padding: 14px 16px;
-  background: rgba(144,96,255,0.08);
-  border-left: 2px solid rgba(144,96,255,0.4);
-  border-radius: 0 8px 8px 0;
-  font-size: 0.82rem;
-  line-height: 1.65;
-  color: rgba(200,200,230,0.7);
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(120,80,220,0.06) 0%, rgba(80,160,220,0.04) 100%);
+  border-left: 3px solid;
+  border-image: linear-gradient(180deg, #9060FF, #4080FF) 1;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.85rem;
+  line-height: 1.72;
+  color: var(--text-secondary, #444);
 }
-.ca-intro-quote em { font-style: normal; font-weight: 700; color: #C8B8FF; display: block; margin-bottom: 6px; }
+.ca-intro-quote em {
+  font-style: italic;
+  font-weight: 700;
+  font-family: var(--font-display, serif);
+  font-size: 1.05rem;
+  color: var(--text-primary, #1A1A1A);
+  display: block;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #7040D8, #4080FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
 /* ── NÚMEROS SCREEN ── */
 .ca-num-hero {

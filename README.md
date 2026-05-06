@@ -68,15 +68,6 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 
 <table>
 <tr>
-<td width="40%"><img src="docs/art-crista.svg" width="100%"/></td>
-<td width="60%"><img src="docs/art-warrior.svg" width="100%"/></td>
-</tr>
-</table>
-
-<br/>
-
-<table>
-<tr>
 <td width="33%"><img src="docs/sq-01.svg" width="100%"/></td>
 <td width="33%"><img src="docs/sq-02.svg" width="100%"/></td>
 <td width="33%"><img src="docs/sq-03.svg" width="100%"/></td>
@@ -91,12 +82,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 <tr>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-a.svg" width="80" height="80"/>
+<br/>
 <b>🌌 Visualising Wisdom</b>
 <br/><br/>
 <sub>Una frase filosófica toma la pantalla completa con fondo sideral. El Oracle la elige según tu estado emocional del momento — no es aleatoria, es contextual. El emotional state vector del Aura Composer filtra la base de frases por resonancia semántica. <em>"La sabiduría es saber que soy nada, el amor es saber que soy todo."</em> — Nisargadatta Maharaj</sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-b.svg" width="80" height="80"/>
 <br/>
 <b>📚 Biblioteca</b>
 <br/><br/>
@@ -105,12 +100,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 </td>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-c.svg" width="80" height="80"/>
+<br/>
 <b>✨ Aura Composer</b>
 <br/><br/>
 <sub>Cinco sliders de estado: calma, foco, creatividad, energía, intuición. El resultado se guarda con timestamp — el Oracle usa este vector 5D para personalizar todo el contenido de la sesión. Tu estado emocional convertido en telemetría cromática que alimenta cada módulo.</sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-d.svg" width="80" height="80"/>
 <br/>
 <b>🔮 Oracle</b>
 <br/><br/>
@@ -121,12 +120,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 <tr>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-b.svg" width="80" height="80"/>
+<br/>
 <b>🌀 Mandala</b>
 <br/><br/>
 <sub>Canvas de dibujo simétrico — tu trazo se multiplica en 4, 6, 8 o 12 ejes. Exportable como PNG. Puede convertirse en el fondo dinámico de tu interfaz personal. <em>"Trazá · repetí · trascendé."</em></sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-a.svg" width="80" height="80"/>
 <br/>
 <b>〜 Lissajous</b>
 <br/><br/>
@@ -135,12 +138,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 </td>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-c.svg" width="80" height="80"/>
+<br/>
 <b>🌅 Morning Journey</b>
 <br/><br/>
 <sub>Ritual matutino en tres pasos: intención del día, gratitud, primera acción concreta. El Oracle personaliza el texto según tu aura del momento. La gamificación es sutil — el sistema trackea días consecutivos y ajusta la dificultad de las preguntas de reflexión.</sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-d.svg" width="80" height="80"/>
 <br/>
 <b>👁 Meditación Ojo</b>
 <br/><br/>
@@ -151,12 +158,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 <tr>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-d.svg" width="80" height="80"/>
+<br/>
 <b>🎵 LoFi</b>
 <br/><br/>
 <sub>Reproductor para estados de concentración y flujo profundo. Integrado con Aura Composer — si tu energía está alta, el Oracle sugiere tracks con mayor tempo. La curación musical responde al estado emocional registrado.</sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-a.svg" width="80" height="80"/>
 <br/>
 <b>🕸 Conexiones</b>
 <br/><br/>
@@ -165,12 +176,16 @@ La navegación completa usa Spring Physics computada en el game loop — sin CSS
 </td>
 <td align="center" width="25%">
 <br/>
+<img src="docs/circle-b.svg" width="80" height="80"/>
+<br/>
 <b>🌀 Fibonacci</b>
 <br/><br/>
 <sub>La espiral de Fibonacci y φ=1.618 animadas con TSL shaders. Tipografía en jerarquía de Círculos Fibonacci — los elementos más grandes en la base del pulgar, decreciendo hacia arriba. El patrón universal visible.</sub>
 <br/><br/>
 </td>
 <td align="center" width="25%">
+<br/>
+<img src="docs/circle-c.svg" width="80" height="80"/>
 <br/>
 <b>📝 Manifiestos</b>
 <br/><br/>

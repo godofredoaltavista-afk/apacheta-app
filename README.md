@@ -122,6 +122,17 @@
 
 ---
 
+## Visual
+
+<table>
+<tr>
+<td width="40%"><img src="docs/art-crista.svg" width="100%"/></td>
+<td width="60%"><img src="docs/art-warrior.svg" width="100%"/></td>
+</tr>
+</table>
+
+---
+
 ## API
 
 ```
